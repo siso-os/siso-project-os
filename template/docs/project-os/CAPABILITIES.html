@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project capabilities</title>
+  <style>
+    :root{color-scheme:light dark;font:16px/1.55 system-ui,sans-serif}body{max-width:68rem;margin:auto;padding:2rem}code{overflow-wrap:anywhere}section{margin-block:2rem}h1,h2{line-height:1.2}
+  </style>
+</head>
+<body data-contract="project-os-installed-capabilities.v1">
+  <main>
+    <h1>Project capabilities</h1>
+    <p>The canonical full-profile entry point is <code>.agents/project-profile.json</code>. It
+      declares installed Project OS capabilities (<code>INSTALL</code>), shared runtime providers
+      (<code>DEPEND</code>), repository-owned behavior (<code>PROJECT_LOCAL</code>), integrations
+      (<code>ADAPTER</code>), and deliberate exclusions (<code>OMIT</code>).</p>
+
+    <section>
+      <h2>One operator contract</h2>
+      <p>Root <code>AGENTS.md</code> and <code>CLAUDE.md</code> route runtime discovery to the thin
+        <code>.agents/skills/project-operator/SKILL.md</code> shim. That shim resolves to the
+        substantive <code>.agents/skills/project-operator/OPERATOR.html</code> authority; no shim
+        copies its body.</p>
+    </section>
+
+    <section>
+      <h2>Bounded discovery</h2>
+      <p>Read-only discovery inventories supported project-local skills, role profiles, commands,
+        proven recipes, and adapters under <code>.agents/</code>, <code>.claude/</code>,
+        <code>.codex/</code>, <code>docs/proven-recipes/</code>,
+        <code>.project-os/adapters/</code>, and <code>.uihub/adapters/</code>. Duplicate identities
+        are migration conflicts; discovery never decides which source wins.</p>
+    </section>
+
+    <section>
+      <h2>Doctor and adoption</h2>
+      <p>The doctor needs no credentials. Agent Base resolves from a provider declaration or
+        <code>SISO_AGENT_BASE_ROOT</code>. Missing required routes fail with remediation.</p>
+      <p>Existing-repository adoption starts with a plan. Differing files are preserved,
+        capability collisions are inventoried, project-local authorities are retained, and runtime
+        shim changes become explicit merge actions.</p>
+    </section>
+  </main>
+  <script id="project-os-meta" type="application/json">
+  {"schema_version":1,"document_id":"route.capabilities","path":"docs/project-os/CAPABILITIES.html","title":"Project capabilities","kind":"index","domain":"project-governance","status":"current","answers_question":"Which project-local capabilities, runtime dependencies, commands, and adapters can an agent use?","authority_key":"route.project-os.capabilities","owner":"project-maintainers","created_at":"2026-07-29","reviewed_at":"2026-07-29","review_due_at":null,"canonical_pointer":"docs/project-os/CAPABILITIES.html","supersedes":[],"superseded_by":null,"source_pointers":[".agents/project-profile.json",".agents/capabilities/project-os.json",".agents/skills/project-operator/SKILL.md",".agents/skills/project-operator/OPERATOR.html"],"evidence":{"grade":"none","observed_at":null,"proof_pointers":[],"verifier":null},"tags":["capabilities","agents","routing"]}
+  </script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://siso.dev/schemas/project-os/agent-profile.schema.json",
+  "title": "Engine-neutral project agent profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "role_id", "title", "description", "ownership", "instruction_routes", "capabilities", "write_scope", "verification"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "role_id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$" },
+    "title": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "description": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "ownership": { "enum": ["INSTALL", "PROJECT_LOCAL"] },
+    "instruction_routes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$" }
+    },
+    "capabilities": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[a-z][a-z0-9.-]{1,127}$" }
+    },
+    "write_scope": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1, "maxLength": 240 }
+    },
+    "verification": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[a-z][a-z0-9.-]{1,127}$" }
+    }
+  }
+}

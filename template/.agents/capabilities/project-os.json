@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "manifest_id": "project-os.full",
+  "title": "Full Project OS capability routes",
+  "description": "Declares what Project OS installs, what remains project-local, and which runtime behavior must be supplied by Agent Base.",
+  "capabilities": [
+    {
+      "id": "project.operator",
+      "kind": "skill",
+      "ownership": "INSTALL",
+      "required": true,
+      "description": "Runtime-mandated skill discovery shim that points to the canonical HTML operator authority.",
+      "path": ".agents/skills/project-operator/SKILL.md",
+      "provider": null,
+      "capability": null,
+      "resolution": null,
+      "routes": ["project lifecycle", "cold pickup", "handoff"]
+    },
+    {
+      "id": "project.operator-authority",
+      "kind": "skill",
+      "ownership": "INSTALL",
+      "required": true,
+      "description": "Deterministic HTML authority loaded through the runtime-mandated SKILL.md discovery shim.",
+      "path": ".agents/skills/project-operator/OPERATOR.html",
+      "provider": null,
+      "capability": null,
+      "resolution": null,
+      "routes": ["project lifecycle authority", "operator contract"]
+    },
+    {
+      "id": "project.operator-profile",
+      "kind": "agent",
+      "ownership": "INSTALL",
+      "required": true,
+      "description": "Typed role contract that points to the canonical project operator skill.",
+      "path": ".agents/agents/project-operator.json",
+      "provider": null,
+      "capability": null,
+      "resolution": null,
+      "routes": ["project operator"]
+    },
+    {
+      "id": "project.onboard",
+      "kind": "command",
+      "ownership": "INSTALL",
+      "required": true,
+      "description": "Read-only machine-readable cold-pickup command.",
+      "path": ".agents/commands/project-os-onboard.json",
+      "provider": null,
+      "capability": null,
+      "resolution": null,
+      "routes": ["project status", "next work"]
+    },
+    {
+      "id": "project.check",
+      "kind": "command",
+      "ownership": "INSTALL",
+      "required": true,
+      "description": "Read-only Project OS integrity command.",
+      "path": ".agents/commands/project-os-check.json",
+      "provider": null,
+      "capability": null,
+      "resolution": null,
+      "routes": ["verification", "handoff"]
+    },
+    {
+      "id": "project.verification",
+      "kind": "adapter",
+      "ownership": "ADAPTER",
+      "required": true,
+      "description": "Maps Project OS integrity output into a reusable verification receipt.",
+      "path": ".agents/adapters/project-os-check.json",
+      "provider": null,
+      "capability": null,
+      "resolution": null,
+      "routes": ["project.check"]
+    },
+    {
+      "id": "project.recipes",
+      "kind": "recipe",
+      "ownership": "PROJECT_LOCAL",
+      "required": false,
+      "description": "Project-authored procedures that remain local and evidence-backed.",
+      "path": "docs/proven-recipes/INDEX.md",
+      "provider": null,
+      "capability": null,
+      "resolution": null,
+      "routes": ["repeatable project procedure"]
+    },
+    {
+      "id": "bridge.claude",
+      "kind": "bridge",
+      "ownership": "INSTALL",
+      "required": true,
+      "description": "Claude discovery guidance that points to the canonical project operator.",
+      "path": "CLAUDE.md",
+      "provider": null,
+      "capability": null,
+      "resolution": null,
+      "routes": ["claude"]
+    },
+    {
+      "id": "bridge.codex",
+      "kind": "bridge",
+      "ownership": "INSTALL",
+      "required": true,
+      "description": "Codex discovery guidance that points to the canonical project operator.",
+      "path": "AGENTS.md",
+      "provider": null,
+      "capability": null,
+      "resolution": null,
+      "routes": ["codex"]
+    },
+    {
+      "id": "runtime.node",
+      "kind": "runtime",
+      "ownership": "DEPEND",
+      "required": true,
+      "description": "Dependency-free Project OS runtime on Node.js 20 or newer.",
+      "path": null,
+      "provider": "node-runtime",
+      "capability": "node",
+      "resolution": {
+        "type": "node",
+        "minimum_major": 20
+      },
+      "routes": ["project-os command runtime"]
+    },
+    {
+      "id": "agent-base.subagents",
+      "kind": "skill",
+      "ownership": "DEPEND",
+      "required": true,
+      "description": "Selects and launches bounded execution lanes; Project OS owns their records, not their processes.",
+      "path": null,
+      "provider": "siso-agent-base",
+      "capability": "subagents",
+      "resolution": {
+        "type": "provider-path",
+        "root_env": "SISO_AGENT_BASE_ROOT",
+        "relative_path": "templates/profile/skills/subagents/SKILL.md"
+      },
+      "routes": ["spawn", "lane selection"]
+    },
+    {
+      "id": "agent-base.conduct",
+      "kind": "skill",
+      "ownership": "DEPEND",
+      "required": true,
+      "description": "Coordinates an in-session fleet while Project OS preserves canonical task and run state.",
+      "path": null,
+      "provider": "siso-agent-base",
+      "capability": "conduct",
+      "resolution": {
+        "type": "provider-path",
+        "root_env": "SISO_AGENT_BASE_ROOT",
+        "relative_path": "templates/profile/skills/conduct/SKILL.md"
+      },
+      "routes": ["multi-lane coordination"]
+    },
+    {
+      "id": "agent-base.orchestrate",
+      "kind": "skill",
+      "ownership": "DEPEND",
+      "required": true,
+      "description": "Runs persistent multi-lane project work without moving runtime ownership into Project OS.",
+      "path": null,
+      "provider": "siso-agent-base",
+      "capability": "orchestrate",
+      "resolution": {
+        "type": "provider-path",
+        "root_env": "SISO_AGENT_BASE_ROOT",
+        "relative_path": "templates/profile/skills/orchestrate/SKILL.md"
+      },
+      "routes": ["persistent orchestration"]
+    },
+    {
+      "id": "agent-base.herdr",
+      "kind": "skill",
+      "ownership": "DEPEND",
+      "required": true,
+      "description": "Supplies persistent terminal and pane control outside Project OS.",
+      "path": null,
+      "provider": "siso-agent-base",
+      "capability": "herdr",
+      "resolution": {
+        "type": "provider-path",
+        "root_env": "SISO_AGENT_BASE_ROOT",
+        "relative_path": "templates/profile/skills/herdr/SKILL.md"
+      },
+      "routes": ["persistent panes"]
+    },
+    {
+      "id": "agent-base.agent-comms",
+      "kind": "skill",
+      "ownership": "DEPEND",
+      "required": true,
+      "description": "Supplies runtime messaging contracts while Project OS stores durable packets and receipts.",
+      "path": null,
+      "provider": "siso-agent-base",
+      "capability": "agent-comms",
+      "resolution": {
+        "type": "provider-path",
+        "root_env": "SISO_AGENT_BASE_ROOT",
+        "relative_path": "templates/profile/skills/agent-comms/SKILL.md"
+      },
+      "routes": ["agent messaging", "handoff transport"]
+    },
+    {
+      "id": "runtime.product-specific-automation",
+      "kind": "runtime",
+      "ownership": "OMIT",
+      "required": false,
+      "description": "Product credentials, endpoints, model policy, and machine automation remain outside the generic Project Kit.",
+      "path": null,
+      "provider": null,
+      "capability": null,
+      "resolution": null,
+      "routes": []
+    }
+  ]
+}

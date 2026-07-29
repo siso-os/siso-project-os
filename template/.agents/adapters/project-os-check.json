@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "adapter_id": "project-os.check-receipt",
+  "title": "Project OS check receipt",
+  "description": "Maps the read-only Project OS check verdict into evidence that tasks and runs can cite.",
+  "ownership": "ADAPTER",
+  "command": "project-os.check",
+  "applies_to": [
+    "task handoff",
+    "run closeout",
+    "project adoption"
+  ],
+  "evidence": {
+    "format": "json",
+    "required_fields": [
+      "ok",
+      "errors",
+      "warnings"
+    ]
+  }
+}

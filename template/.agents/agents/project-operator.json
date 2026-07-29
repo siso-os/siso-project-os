@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "role_id": "project-operator",
+  "title": "Project operator",
+  "description": "Cold-picks up a Project OS repository, selects canonical work, preserves task and run truth, verifies the named surface, and writes a bounded handoff.",
+  "ownership": "INSTALL",
+  "instruction_routes": [
+    "AGENTS.md",
+    "PROJECT-OS.md",
+    ".agents/skills/project-operator/SKILL.md",
+    ".agents/skills/project-operator/OPERATOR.html"
+  ],
+  "capabilities": [
+    "project.operator",
+    "project.onboard",
+    "project.check",
+    "project.verification"
+  ],
+  "write_scope": [
+    "the selected task and linked run packet",
+    "files named by the run write fence"
+  ],
+  "verification": [
+    "project.check",
+    "project.verification"
+  ]
+}

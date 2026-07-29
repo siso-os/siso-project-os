@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Full-profile capabilities and adoption</title>
+  <style>
+    :root{color-scheme:light dark;font:16px/1.55 system-ui,sans-serif}body{max-width:72rem;margin:auto;padding:2rem}code{overflow-wrap:anywhere}table{border-collapse:collapse;width:100%}th,td{border:1px solid #8888;padding:.55rem;text-align:left;vertical-align:top}pre{overflow:auto;padding:1rem;background:#7772}section{margin-block:2rem}h1,h2{line-height:1.2}
+  </style>
+</head>
+<body data-contract="project-os-capability-guide.v1">
+  <main>
+    <h1>Full-profile capabilities and adoption</h1>
+    <p>The full profile makes project-local operating capabilities permanent and discoverable
+      without turning Project OS into an agent runtime. Its canonical entry point is
+      <code>.agents/project-profile.json</code>. Runtime discovery loads the thin
+      <code>.agents/skills/project-operator/SKILL.md</code> shim, which resolves to the substantive
+      <code>.agents/skills/project-operator/OPERATOR.html</code> authority.</p>
+
+    <section id="ownership">
+      <h2>Ownership semantics</h2>
+      <table>
+        <thead><tr><th>Value</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>INSTALL</code></td><td>Generic Project OS structure installed in every full-profile repository.</td></tr>
+          <tr><td><code>DEPEND</code></td><td>Behavior supplied by a declared provider such as SISO Agent Base or Node.js.</td></tr>
+          <tr><td><code>PROJECT_LOCAL</code></td><td>Repeatable product or repository knowledge whose canonical source stays in this repository.</td></tr>
+          <tr><td><code>ADAPTER</code></td><td>A bridge from an engine or project check into a Project OS contract or receipt.</td></tr>
+          <tr><td><code>OMIT</code></td><td>Deliberately excluded product, credential, model-policy, or machine-specific behavior.</td></tr>
+        </tbody>
+      </table>
+      <p>The starter declares Node.js 20+ and Agent Base <code>subagents</code>,
+        <code>conduct</code>, <code>orchestrate</code>, <code>herdr</code>, and
+        <code>agent-comms</code> as dependencies. Doctoring resolves Agent Base from
+        <code>providerRoots</code> or <code>SISO_AGENT_BASE_ROOT</code>; it embeds no workstation
+        path and requires no secret.</p>
+    </section>
+
+    <section id="discovery">
+      <h2>Discovery and doctor</h2>
+      <p><code>discoverProjectCapabilities(root, options)</code> returns deterministic JSON for
+        supported <code>.agents</code>, <code>.claude</code>, <code>.codex</code>, proven-recipe,
+        and adapter routes. Scans are bounded by file count, depth, and bytes; do not follow
+        symlinks; tolerate absent engine directories; and report invalid or ambiguous definitions.</p>
+      <p><code>doctorProjectCapabilities(root, options)</code> validates the profile, manifests,
+        role profiles, commands, verification adapters, runtime shims, and every required provider.
+        Its result is directly renderable as generated HTML.</p>
+    </section>
+
+    <section id="adoption">
+      <h2>Non-destructive adoption</h2>
+      <p><code>planFullProfileAdoption(root)</code> inventories current capabilities and classifies
+        each asset as <code>create</code>, identical <code>retain</code>, or differing
+        <code>preserve</code>. <code>applyFullProfileAdoption(root, options)</code> applies only a
+        collision-free plan with exclusive writes and rollback of files created by a failed attempt.
+        It never rewrites an existing root runtime shim.</p>
+      <p>Claude discovers the canonical skill through root <code>CLAUDE.md</code>; Codex uses root
+        <code>AGENTS.md</code>. Both are pointer-only runtime shims.</p>
+    </section>
+
+    <section id="scaffolds">
+      <h2>Project-local scaffold APIs</h2>
+      <ul>
+        <li><code>scaffoldProjectSkill</code> → <code>.agents/skills/&lt;id&gt;/SKILL.md</code></li>
+        <li><code>scaffoldProjectAgent</code> → <code>.agents/agents/&lt;id&gt;.json</code></li>
+        <li><code>scaffoldProjectCommand</code> → <code>.agents/commands/&lt;id&gt;.json</code></li>
+      </ul>
+      <p>All are idempotent for identical content, reject divergent collisions, and use the one
+        engine-neutral capability root. Command contracts store a program plus argv, never a shell
+        string.</p>
+    </section>
+
+    <section id="integration">
+      <h2>Shared-lane integration surface</h2>
+      <pre><code>src/capabilities.mjs:
+  discoverProjectCapabilities
+  doctorProjectCapabilities
+
+src/adoption.mjs:
+  planFullProfileAdoption
+  applyFullProfileAdoption
+  scaffoldProjectSkill
+  scaffoldProjectAgent
+  scaffoldProjectCommand</code></pre>
+      <p>Generated <code>capabilities.json</code> should preserve these return contracts. Generated
+        HTML remains a read-only projection and never writes a manifest.</p>
+    </section>
+  </main>
+  <script id="capability-guide-contract" type="application/json">
+  {"schema_version":1,"contract":"project-os-capability-guide.v1","canonical_profile":".agents/project-profile.json","operator_discovery_shim":".agents/skills/project-operator/SKILL.md","operator_authority":".agents/skills/project-operator/OPERATOR.html","runtime_shims":{"claude":"CLAUDE.md","codex":"AGENTS.md"},"exports":{"capabilities":["discoverProjectCapabilities","doctorProjectCapabilities"],"adoption":["planFullProfileAdoption","applyFullProfileAdoption","scaffoldProjectSkill","scaffoldProjectAgent","scaffoldProjectCommand"]}}
+  </script>
+</body>
+</html>

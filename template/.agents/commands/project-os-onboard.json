@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "command_id": "project-os.onboard",
+  "title": "Project OS onboarding report",
+  "description": "Read canonical project state and return health, human gates, and unblocked next work without writing files.",
+  "ownership": "INSTALL",
+  "mode": "read-only",
+  "program": "project-os",
+  "arguments": [
+    "onboard",
+    ".",
+    "--json"
+  ],
+  "cwd": ".",
+  "required_capabilities": [
+    "runtime.node"
+  ],
+  "success": {
+    "exit_codes": [
+      0
+    ],
+    "output": "json"
+  }
+}

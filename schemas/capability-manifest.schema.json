@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://siso.dev/schemas/project-os/capability-manifest.schema.json",
+  "title": "Project capability manifest",
+  "description": "A deterministic inventory of installed, provider-owned, project-local, adapted, and omitted capabilities.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "manifest_id", "title", "description", "capabilities"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "manifest_id": { "type": "string", "pattern": "^[a-z][a-z0-9.-]{1,127}$" },
+    "title": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "description": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "capabilities": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/capability" }
+    }
+  },
+  "$defs": {
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "ownership", "required", "description", "path", "provider", "capability", "resolution", "routes"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9.-]{1,127}$" },
+        "kind": { "enum": ["skill", "agent", "command", "recipe", "adapter", "bridge", "runtime"] },
+        "ownership": { "enum": ["INSTALL", "DEPEND", "PROJECT_LOCAL", "ADAPTER", "OMIT"] },
+        "required": { "type": "boolean" },
+        "description": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "path": {
+          "oneOf": [
+            { "type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$" },
+            { "type": "null" }
+          ]
+        },
+        "provider": {
+          "oneOf": [
+            { "type": "string", "minLength": 1, "maxLength": 100 },
+            { "type": "null" }
+          ]
+        },
+        "capability": {
+          "oneOf": [
+            { "type": "string", "minLength": 1, "maxLength": 160 },
+            { "type": "null" }
+          ]
+        },
+        "resolution": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["type"],
+              "properties": {
+                "type": { "enum": ["provider-path", "node"] },
+                "root_env": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]+$" },
+                "relative_path": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$" },
+                "minimum_major": { "type": "integer", "minimum": 1 }
+              }
+            },
+            { "type": "null" }
+          ]
+        },
+        "routes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1, "maxLength": 240 }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "ownership": { "const": "DEPEND" } } },
+          "then": {
+            "properties": {
+              "provider": { "type": "string", "minLength": 1 },
+              "capability": { "type": "string", "minLength": 1 },
+              "resolution": { "type": "object" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "ownership": { "enum": ["INSTALL", "PROJECT_LOCAL", "ADAPTER"] } } },
+          "then": { "properties": { "path": { "type": "string", "minLength": 1 } } }
+        },
+        {
+          "if": { "properties": { "ownership": { "const": "OMIT" } } },
+          "then": { "properties": { "required": { "const": false } } }
+        }
+      ]
+    }
+  }
+}

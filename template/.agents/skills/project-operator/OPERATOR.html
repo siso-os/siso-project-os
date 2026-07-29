@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project operator</title>
+  <style>
+    :root{color-scheme:light dark;font:16px/1.55 system-ui,sans-serif}body{max-width:68rem;margin:auto;padding:2rem}code{overflow-wrap:anywhere}section{margin-block:2rem}h1,h2{line-height:1.2}
+  </style>
+</head>
+<body data-contract="project-os-operator.v1">
+  <main>
+    <h1>Project operator</h1>
+    <p>This is the canonical engine-neutral operating authority. Runtime-mandated Markdown files
+      are thin discovery shims that point here and never copy this contract.</p>
+
+    <section id="cold-pickup">
+      <h2>Cold pickup</h2>
+      <ol>
+        <li>Read root <code>AGENTS.md</code>, then <code>PROJECT-OS.md</code>.</li>
+        <li>Read <code>.agents/project-profile.json</code> and its capability manifests.</li>
+        <li>Run the read-only <code>project-os onboard . --json</code> command contract.</li>
+        <li>Select one unblocked canonical task and read its dependencies, acceptance criteria,
+          affected files, evidence, and execution log.</li>
+        <li>Create or reuse a linked run packet before a substantial execution attempt.</li>
+      </ol>
+      <p>Stop when a required profile route or provider fails doctoring. Report its remediation;
+        never replace it with an improvised local copy.</p>
+    </section>
+
+    <section id="lifecycle">
+      <h2>Lifecycle</h2>
+      <ul>
+        <li>Create and update work through Project OS commands. Canonical task JSON is authority;
+          dashboards and generated HTML are projections.</li>
+        <li>Sprints and runs reference existing task IDs and never create a second backlog.</li>
+        <li>Keep project-specific repeatable behavior under the project-local capability root.</li>
+        <li>Keep shared spawning, routing, messaging, telemetry, model, and terminal behavior in
+          its declared Agent Base provider.</li>
+        <li>Preserve unrelated dirty work and respect the run packet write fence.</li>
+      </ul>
+    </section>
+
+    <section id="handoff">
+      <h2>Verify and hand off</h2>
+      <ol>
+        <li>Run the closest executable checks named by the task and project configuration.</li>
+        <li>Run the read-only <code>project-os check . --json</code> command contract.</li>
+        <li>Attach evidence pointers and truthful verification state to canonical task/run JSON.</li>
+        <li>Rebuild generated projections only after authored state is correct.</li>
+        <li>Return a bounded PASS, FAIL, or BLOCKED handoff with exact evidence paths.</li>
+      </ol>
+      <p>Never edit generated state as authority, call an unobserved result proven, or copy a
+        global Agent Base skill into this project.</p>
+    </section>
+
+    <section id="dependencies">
+      <h2>Runtime dependencies</h2>
+      <p>Project OS records packets and outcomes. Worker actuation comes from the declared
+        <code>siso-agent-base</code> provider: <code>subagents</code>, <code>conduct</code>,
+        <code>orchestrate</code>, <code>herdr</code>, and <code>agent-comms</code>. Their absence is a
+        full-profile doctor failure, not permission to vendor them locally.</p>
+    </section>
+  </main>
+  <script id="project-operator-contract" type="application/json">
+  {"schema_version":1,"contract":"project-os-operator.v1","discovery_shim":".agents/skills/project-operator/SKILL.md","canonical_authority":".agents/skills/project-operator/OPERATOR.html","boot":["AGENTS.md","PROJECT-OS.md",".agents/project-profile.json","project-os onboard . --json","canonical task JSON","linked run packet"],"required_provider":{"id":"siso-agent-base","capabilities":["subagents","conduct","orchestrate","herdr","agent-comms"]},"handoff_verdicts":["PASS","FAIL","BLOCKED"]}
+  </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://siso.dev/schemas/project-os/command.schema.json",
+  "title": "Engine-neutral command contract",
+  "description": "A command is stored as argv rather than a shell string so engines can invoke it without interpolation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "command_id", "title", "description", "ownership", "mode", "program", "arguments", "cwd", "required_capabilities", "success"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "command_id": { "type": "string", "pattern": "^[a-z][a-z0-9.-]{1,127}$" },
+    "title": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "description": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "ownership": { "enum": ["INSTALL", "PROJECT_LOCAL"] },
+    "mode": { "enum": ["read-only", "mutating"] },
+    "program": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "arguments": {
+      "type": "array",
+      "maxItems": 64,
+      "items": { "type": "string", "maxLength": 500 }
+    },
+    "cwd": { "const": "." },
+    "required_capabilities": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[a-z][a-z0-9.-]{1,127}$" }
+    },
+    "success": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["exit_codes", "output"],
+      "properties": {
+        "exit_codes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "integer", "minimum": 0, "maximum": 255 }
+        },
+        "output": { "enum": ["json", "text"] }
+      }
+    }
+  }
+}

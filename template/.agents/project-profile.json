@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "profile_id": "full",
+  "title": "Full SISO Project Kit",
+  "description": "Engine-neutral project operation, capability discovery, provider routes, command contracts, and verification adapters.",
+  "capability_root": ".agents",
+  "canonical_operator": ".agents/skills/project-operator/SKILL.md",
+  "operator_authority": ".agents/skills/project-operator/OPERATOR.html",
+  "capability_manifests": [
+    ".agents/capabilities/project-os.json"
+  ],
+  "agent_profiles": [
+    ".agents/agents/project-operator.json"
+  ],
+  "commands": [
+    ".agents/commands/project-os-onboard.json",
+    ".agents/commands/project-os-check.json"
+  ],
+  "verification_adapters": [
+    ".agents/adapters/project-os-check.json"
+  ],
+  "bridges": [
+    {
+      "engine": "claude",
+      "path": "CLAUDE.md",
+      "canonical": ".agents/skills/project-operator/SKILL.md"
+    },
+    {
+      "engine": "codex",
+      "path": "AGENTS.md",
+      "canonical": ".agents/skills/project-operator/SKILL.md"
+    }
+  ],
+  "discovery": {
+    "max_files_per_root": 200,
+    "max_total_files": 1000,
+    "max_file_bytes": 262144,
+    "max_depth": 5
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "command_id": "project-os.check",
+  "title": "Project OS integrity check",
+  "description": "Validate schemas, references, canonical routes, generated drift, and proof links without repairing authored state.",
+  "ownership": "INSTALL",
+  "mode": "read-only",
+  "program": "project-os",
+  "arguments": [
+    "check",
+    ".",
+    "--json"
+  ],
+  "cwd": ".",
+  "required_capabilities": [
+    "runtime.node"
+  ],
+  "success": {
+    "exit_codes": [
+      0
+    ],
+    "output": "json"
+  }
+}
