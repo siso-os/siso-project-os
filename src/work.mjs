@@ -17,6 +17,13 @@ import {
   writeJsonAtomic,
 } from './shared.mjs'
 import { assertProjectRecord } from './schema.mjs'
+import {
+  assertRunCloseReady,
+  createDirectoryAtomic,
+  mutateDirectoryAtomic,
+  readJsonLines,
+  withLifecycleLock,
+} from './lifecycle-core.mjs'
 
 const TASK_ID = /^TASK-(\d{4})$/
 
@@ -211,6 +218,102 @@ export async function updateTask(root, id, flags) {
   })
 }
 
+export async function claimNextTask(root, flags = {}) {
+  const by = typeof flags.by === 'string' ? flags.by.trim() : ''
+  const owner = typeof flags.owner === 'string' ? flags.owner.trim() : by
+  if (!by || !owner) throw new Error('task claim-next requires --by or --owner')
+  const requestedDomain = typeof flags.domain === 'string' ? flags.domain.trim() : null
+  const requestedPriority = typeof flags.priority === 'string' ? flags.priority.trim() : null
+  if (requestedPriority && !TASK_PRIORITIES.includes(requestedPriority)) {
+    throw new Error(`priority must be one of: ${TASK_PRIORITIES.join(', ')}`)
+  }
+  return withRegistryLock(root, async () => {
+    const entries = await scanTasks(root)
+    const byId = new Map()
+    for (const entry of entries) {
+      if (entry.task && !entry.parseError) {
+        if (byId.has(entry.name)) throw new Error(`${entry.name} exists in multiple lifecycle folders; repair the registry before claiming work`)
+        byId.set(entry.name, entry.task)
+      }
+    }
+    const candidates = entries.filter((entry) => {
+      const task = entry.task
+      if (!task || entry.parseError || entry.folder !== 'backlog' || task.status !== 'backlog') return false
+      if (requestedDomain && task.domain !== requestedDomain) return false
+      if (requestedPriority && task.priority !== requestedPriority) return false
+      if (task.requires_human && flags['allow-human'] !== true && flags.allow_human !== true) return false
+      return (task.dependencies ?? []).every((dependencyId) => byId.get(dependencyId)?.status === 'completed')
+    })
+    candidates.sort((left, right) => {
+      const priority = TASK_PRIORITIES.indexOf(left.task.priority) - TASK_PRIORITIES.indexOf(right.task.priority)
+      return priority || left.name.localeCompare(right.name)
+    })
+    const entry = candidates[0]
+    if (!entry) throw new Error('no dependency-ready backlog task matches the claim filters')
+    const timestamp = isoNow(flags)
+    const task = structuredClone(entry.task)
+    task.status = 'in_progress'
+    task.owner = owner
+    task.claimed_at = task.claimed_at ?? timestamp
+    task.updated_at = timestamp
+    task.blocker = null
+    if (typeof flags.profile === 'string' || typeof flags.stage === 'string') {
+      task.workflow = {
+        profile: typeof flags.profile === 'string' ? flags.profile : 'default',
+        stage: typeof flags.stage === 'string' ? flags.stage : 'prepping',
+      }
+    }
+    const eventsPath = join(entry.directory, 'events.jsonl')
+    const seq = (await pathExists(eventsPath))
+      ? (await readFile(eventsPath, 'utf8')).split('\n').filter(Boolean).length + 1
+      : 1
+    const event = { seq, at: timestamp, by, action: 'claimed_next', status: 'in_progress', owner }
+    await assertProjectRecord(root, 'task', task)
+    const target = join(root, '.agents', 'tasks', 'in_progress', entry.name)
+    if (await pathExists(target)) throw new Error(`cannot claim ${entry.name}: destination already exists`)
+    await replaceTaskDirectory(root, entry, target, task, event)
+    return task
+  })
+}
+
+export async function archiveTask(root, id, flags = {}) {
+  if (!TASK_ID.test(id)) throw new Error('task archive requires a TASK-NNNN identifier')
+  const by = typeof flags.by === 'string' ? flags.by.trim() : ''
+  const reason = typeof flags.reason === 'string' ? flags.reason.trim() : ''
+  if (!by || !reason) throw new Error('task archive requires --by and --reason')
+  return withRegistryLock(root, async () => {
+    const entry = await findTask(root, id)
+    if (entry.folder === 'archived') {
+      if (entry.task.archive?.archived_by === by && entry.task.archive?.reason === reason) return entry.task
+      throw new Error(`${id} is already archived with a different receipt`)
+    }
+    if (!['completed', 'cancelled'].includes(entry.task.status)) throw new Error('only completed or cancelled tasks can be archived')
+    const target = join(root, '.agents', 'tasks', 'archived', id)
+    if (await pathExists(target)) throw new Error(`cannot archive ${id}: destination already exists`)
+    const plan = {
+      id,
+      source: `.agents/tasks/${entry.folder}/${id}`,
+      destination: `.agents/tasks/archived/${id}`,
+      prior_status: entry.task.status,
+      reason,
+      by,
+    }
+    if (flags.dry_run === true || flags['dry-run'] === true) return { ...plan, dry_run: true }
+    const timestamp = isoNow(flags)
+    const task = structuredClone(entry.task)
+    task.archive = { archived_at: timestamp, archived_by: by, reason, previous_folder: entry.folder }
+    task.updated_at = timestamp
+    const eventsPath = join(entry.directory, 'events.jsonl')
+    const seq = (await pathExists(eventsPath))
+      ? (await readFile(eventsPath, 'utf8')).split('\n').filter(Boolean).length + 1
+      : 1
+    const event = { seq, at: timestamp, by, action: 'archived', status: task.status, reason, previous_folder: entry.folder }
+    await assertProjectRecord(root, 'task', task)
+    await replaceTaskDirectory(root, entry, target, task, event)
+    return task
+  })
+}
+
 async function replaceTaskDirectory(root, entry, target, task, event) {
   const tasksRoot = join(root, '.agents', 'tasks')
   const nonce = `${process.pid}-${Date.now()}`
@@ -274,9 +377,14 @@ export async function createSprint(root, flags) {
   }
   const directory = join(base, id)
   await assertProjectRecord(root, 'sprint', record)
-  await mkdir(join(directory, 'lanes'), { recursive: true })
-  await writeJsonAtomic(join(directory, 'sprint.json'), record)
-  await writeFile(join(directory, 'lanes', '.gitkeep'), '', 'utf8')
+  await createDirectoryAtomic(directory, async (temporary) => {
+    await mkdir(join(temporary, 'lanes'), { recursive: true })
+    await mkdir(join(temporary, 'evidence'), { recursive: true })
+    await writeJsonAtomic(join(temporary, 'sprint.json'), record)
+    await writeFile(join(temporary, 'lanes', '.gitkeep'), '', 'utf8')
+    await writeFile(join(temporary, 'evidence', '.gitkeep'), '', 'utf8')
+    await writeFile(join(temporary, 'ledger.jsonl'), `${JSON.stringify({ seq: 1, at: record.created_at, by: record.created_by, action: 'created' })}\n`, 'utf8')
+  })
   return record
 }
 
@@ -318,13 +426,27 @@ export async function createRun(root, flags) {
     created_by: typeof flags.by === 'string' ? flags.by : 'human',
   }
   const directory = join(base, id)
-  await assertProjectRecord(root, 'run', record)
-  for (const child of ['briefs', 'returns', 'evidence']) {
-    await mkdir(join(directory, child), { recursive: true })
-    await writeFile(join(directory, child, '.gitkeep'), '', 'utf8')
+  const queue = {
+    schema_version: 1,
+    run_id: id,
+    revision: 0,
+    updated_at: record.created_at,
+    units: [],
+    packet_digests: [],
   }
-  await writeJsonAtomic(join(directory, 'run.json'), record)
-  await writeFile(join(directory, 'ledger.jsonl'), `${JSON.stringify({ seq: 1, at: record.created_at, by: record.created_by, action: 'created' })}\n`, 'utf8')
+  const createdEvent = { schema_version: 1, run_id: id, seq: 1, at: record.created_at, by: record.created_by, action: 'created' }
+  await assertProjectRecord(root, 'run', record)
+  await assertProjectRecord(root, 'run-queue', queue)
+  await assertProjectRecord(root, 'run-event', createdEvent)
+  await createDirectoryAtomic(directory, async (temporary) => {
+    for (const child of ['briefs', 'returns', 'evidence', 'attempts']) {
+      await mkdir(join(temporary, child), { recursive: true })
+      await writeFile(join(temporary, child, '.gitkeep'), '', 'utf8')
+    }
+    await writeJsonAtomic(join(temporary, 'run.json'), record)
+    await writeJsonAtomic(join(temporary, 'queue.json'), queue)
+    await writeFile(join(temporary, 'ledger.jsonl'), `${JSON.stringify(createdEvent)}\n`, 'utf8')
+  })
   return record
 }
 
@@ -334,26 +456,41 @@ export async function closeRun(root, id, flags) {
   const summary = typeof flags.summary === 'string' ? flags.summary.trim() : ''
   if (!by || !summary) throw new Error('run close requires --by and --summary')
   if (!['passed', 'failed', 'cancelled'].includes(verdict)) throw new Error('run close --verdict must be passed, failed, or cancelled')
-  const path = join(root, '.agents', 'runs', id, 'run.json')
+  const directory = join(root, '.agents', 'runs', id)
+  const path = join(directory, 'run.json')
   if (!(await pathExists(path))) throw new Error(`${id} was not found`)
-  const record = await readJson(path)
-  if (['completed', 'failed', 'cancelled'].includes(record.status)) throw new Error(`${id} is already closed`)
-  const timestamp = isoNow(flags)
-  record.status = verdict === 'passed' ? 'completed' : verdict
-  record.closeout = {
-    closed_at: timestamp,
-    closed_by: by,
-    verdict,
-    summary,
-    outputs: [],
-  }
-  await assertProjectRecord(root, 'run', record)
-  await writeJsonAtomic(path, record)
-  await appendJsonLine(join(root, '.agents', 'runs', id, 'ledger.jsonl'), {
-    at: timestamp,
-    by,
-    action: 'closed',
-    verdict,
+  const outputs = Array.isArray(flags.outputs) ? structuredClone(flags.outputs) : []
+  return withLifecycleLock(root, 'runs', id, async () => {
+    const current = await readJson(path)
+    if (['completed', 'failed', 'cancelled'].includes(current.status)) {
+      const expectedStatus = verdict === 'passed' ? 'completed' : verdict
+      const same = current.status === expectedStatus && current.closeout?.closed_by === by
+        && current.closeout?.verdict === verdict && current.closeout?.summary === summary
+        && JSON.stringify(current.closeout?.outputs ?? []) === JSON.stringify(outputs)
+      if (same) return current
+      throw new Error(`${id} is already closed with a different receipt`)
+    }
+    await assertRunCloseReady(root, id, current, { verdict, outputs })
+    return mutateDirectoryAtomic(directory, async (temporary) => {
+      const recordPath = join(temporary, 'run.json')
+      const record = await readJson(recordPath)
+      const timestamp = isoNow(flags)
+      record.status = verdict === 'passed' ? 'completed' : verdict
+      record.closeout = {
+        closed_at: timestamp,
+        closed_by: by,
+        verdict,
+        summary,
+        outputs,
+      }
+      await assertProjectRecord(root, 'run', record)
+      await writeJsonAtomic(recordPath, record)
+      const ledgerPath = join(temporary, 'ledger.jsonl')
+      const ledger = await readJsonLines(ledgerPath)
+      const event = { schema_version: 1, run_id: id, seq: ledger.length + 1, at: timestamp, by, action: 'closed', verdict }
+      await assertProjectRecord(root, 'run-event', event)
+      await appendJsonLine(ledgerPath, event)
+      return record
+    })
   })
-  return record
 }

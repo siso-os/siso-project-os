@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Run lifecycle contract</title></head><body>
+<main data-contract="run-lifecycle"><h1>Runs</h1><p>A run is one execution attempt linked to canonical tasks and optionally a sprint.</p><pre>RUN-YYYY-MM-DD-slug/
+  run.json
+  queue.json
+  ledger.jsonl
+  briefs/
+  returns/
+  evidence/
+  attempts/&lt;unit&gt;/attempt-&lt;n&gt;/attempt.receipt.json
+  attempts/&lt;unit&gt;/attempt-&lt;n&gt;/verification.receipt.json
+  attempts/&lt;unit&gt;/attempt-&lt;n&gt;/result.json</pre><p>Packets are immutable; amendments are new packets. Queue unit state mirrors run.json and retains packet digests. Closeout refuses non-terminal attempts, active claims, modified packets, unresolved gates, unclassified outputs, or landed work without independent verification and remote-equality proof.</p></main>
+<script id="project-os-run-contract" type="application/json">{"schema_version":1,"canonical":"run.json","required_files":["run.json","queue.json","ledger.jsonl"],"terminal_units":["landed","blocked","failed","cancelled"]}</script>
+</body></html>

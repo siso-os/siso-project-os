@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://siso.dev/schemas/project-os/gate-receipt.schema.json",
+  "title": "SISO Project OS Gate Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "scope", "owner_id", "gate_id", "status", "command", "exit_code", "evidence_refs", "waiver_reason", "recorded_at", "recorded_by"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "scope": { "type": "string", "enum": ["sprint", "run"] },
+    "owner_id": { "type": "string", "minLength": 1 },
+    "gate_id": { "type": "string", "minLength": 1 },
+    "status": { "type": "string", "enum": ["passed", "failed", "waived"] },
+    "command": { "type": ["string", "null"], "minLength": 1 },
+    "exit_code": { "type": ["integer", "null"] },
+    "evidence_refs": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "waiver_reason": { "type": ["string", "null"], "minLength": 1 },
+    "recorded_at": { "type": "string", "format": "date-time" },
+    "recorded_by": { "type": "string", "minLength": 1 }
+  }
+}

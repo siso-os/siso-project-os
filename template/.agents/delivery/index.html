@@ -1,0 +1,5 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Delivery contract</title></head><body>
+<main data-contract="delivery"><h1>Delivery records</h1><p>Each delivery has immutable <code>plan.json</code>, append-only <code>ledger.jsonl</code>, evidence, and one immutable <code>landing.receipt.json</code>. Plans serialize ordered refs, invariants, conflict decisions, regeneration, gates, STOP or ASK items, allowed destination, and push posture.</p><p>A landed receipt needs distinct verifier and integrator identities, passed independent verification, gate refs, before and after commits, and passed remote equality. Project OS records the protocol; adapters execute product-specific Git, deployment, and rollback commands.</p></main>
+<script id="project-os-delivery-contract" type="application/json">{"schema_version":1,"canonical_files":["plan.json","ledger.jsonl","landing.receipt.json"],"executes_delivery":false,"landed_requires":["independent_verification","gate_receipts","remote_equality"]}</script>
+</body></html>

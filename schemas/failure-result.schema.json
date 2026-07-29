@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://siso.dev/schemas/project-os/failure-result.schema.json",
+  "title": "SISO Project OS Terminal Unit Result",
+  "description": "Durable terminal census record, including typed failure and landed dispositions.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "run_id", "unit_id", "attempt", "disposition", "type", "summary", "process", "candidate_sha", "worktree_ref", "verification_receipt", "landing_receipt", "retained_artifacts", "recovery_action", "next_attempt_policy", "recorded_at", "recorded_by"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "run_id": { "type": "string", "pattern": "^RUN-[0-9]{4}-[0-9]{2}-[0-9]{2}-[a-z0-9][a-z0-9-]*$" },
+    "unit_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" },
+    "attempt": { "type": "integer", "minimum": 1 },
+    "disposition": { "type": "string", "enum": ["landed", "artifact_only", "prepared", "blocked", "failed", "cancelled"] },
+    "type": { "type": "string", "enum": ["none", "dependency", "verification", "write_conflict", "environment", "timeout", "authorization", "landing", "cancelled", "unknown"] },
+    "summary": { "type": "string", "minLength": 1 },
+    "process": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["exit_code", "signal", "stderr_ref"],
+      "properties": {
+        "exit_code": { "type": ["integer", "null"] },
+        "signal": { "type": ["string", "null"], "minLength": 1 },
+        "stderr_ref": { "type": ["string", "null"], "minLength": 1 }
+      }
+    },
+    "candidate_sha": { "type": ["string", "null"], "minLength": 1 },
+    "worktree_ref": { "type": ["string", "null"], "minLength": 1 },
+    "verification_receipt": { "type": ["string", "null"], "minLength": 1 },
+    "landing_receipt": { "type": ["string", "null"], "minLength": 1 },
+    "retained_artifacts": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "recovery_action": { "type": "string", "minLength": 1 },
+    "next_attempt_policy": { "type": "string", "minLength": 1 },
+    "recorded_at": { "type": "string", "format": "date-time" },
+    "recorded_by": { "type": "string", "minLength": 1 }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "disposition": { "const": "landed" } }, "required": ["disposition"] },
+      "then": {
+        "properties": {
+          "type": { "const": "none" },
+          "candidate_sha": { "type": "string", "minLength": 1 },
+          "verification_receipt": { "type": "string", "minLength": 1 },
+          "landing_receipt": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  ]
+}

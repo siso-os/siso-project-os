@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sprint lifecycle contract</title></head><body>
+<main data-contract="sprint-lifecycle"><h1>Sprints</h1><p>A sprint coordinates canonical task IDs through <code>sprint.json</code>, <code>ledger.jsonl</code>, lane artifacts, and evidence.</p><pre>SPRINT-YYYY-MM-DD-slug/
+  sprint.json
+  ledger.jsonl
+  lanes/&lt;lane&gt;/brief.packet.json
+  lanes/&lt;lane&gt;/state.json
+  lanes/&lt;lane&gt;/log.jsonl
+  lanes/&lt;lane&gt;/returns/
+  evidence/</pre><p>Starting freezes membership. Lane write fences may overlap only through explicit sequencing. Successful close requires passed lanes and receipted required gates; archive is a separate terminal move.</p></main>
+<script id="project-os-sprint-contract" type="application/json">{"schema_version":1,"canonical":"sprint.json","lane_files":["brief.packet.json","state.json","log.jsonl","returns/"],"terminal_lane_states":["passed","failed","cancelled"]}</script>
+</body></html>

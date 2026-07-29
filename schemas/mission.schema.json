@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://siso.dev/schemas/project-os/mission.schema.json",
+  "title": "SISO Project OS Mission Ownership",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "slug", "objective", "state", "owner", "acquired_at", "heartbeat_at", "active_task_ids", "active_sprint_id", "active_run_id"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "id": { "type": "string", "pattern": "^MISSION-[a-z0-9][a-z0-9-]*$" },
+    "slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "objective": { "type": "string", "minLength": 1 },
+    "state": { "type": "string", "enum": ["acquired", "released", "quarantined"] },
+    "owner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actor", "ancestry"],
+      "properties": {
+        "actor": { "type": "string", "minLength": 1 },
+        "ancestry": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "acquired_at": { "type": "string", "format": "date-time" },
+    "heartbeat_at": { "type": "string", "format": "date-time" },
+    "active_task_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/taskId" } },
+    "active_sprint_id": { "anyOf": [{ "$ref": "#/$defs/sprintId" }, { "type": "null" }] },
+    "active_run_id": { "anyOf": [{ "$ref": "#/$defs/runId" }, { "type": "null" }] },
+    "released_at": { "type": "string", "format": "date-time" },
+    "released_by": { "type": "string", "minLength": 1 },
+    "release_reason": { "type": "string", "minLength": 1 },
+    "quarantined_at": { "type": "string", "format": "date-time" },
+    "quarantined_by": { "type": "string", "minLength": 1 },
+    "quarantine_reason": { "type": "string", "minLength": 1 }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "state": { "const": "released" } }, "required": ["state"] },
+      "then": { "required": ["released_at", "released_by", "release_reason"] }
+    },
+    {
+      "if": { "properties": { "state": { "const": "quarantined" } }, "required": ["state"] },
+      "then": { "required": ["quarantined_at", "quarantined_by", "quarantine_reason"] }
+    }
+  ],
+  "$defs": {
+    "taskId": { "type": "string", "pattern": "^TASK-[0-9]{4}$" },
+    "sprintId": { "type": "string", "pattern": "^SPRINT-[0-9]{4}-[0-9]{2}-[0-9]{2}-[a-z0-9][a-z0-9-]*$" },
+    "runId": { "type": "string", "pattern": "^RUN-[0-9]{4}-[0-9]{2}-[0-9]{2}-[a-z0-9][a-z0-9-]*$" }
+  }
+}

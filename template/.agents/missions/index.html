@@ -1,0 +1,5 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mission ownership contract</title></head><body>
+<main data-contract="mission-ownership"><h1>Mission ownership</h1><p>Only one <code>MISSION-*.lock/</code> directory may be live. Atomic directory creation acquires it; an existing lock is never stolen because its heartbeat looks old.</p><p>Release verifies owner ancestry and moves the lock to history. Suspect locks move only through explicit, reasoned quarantine and remain inspectable.</p></main>
+<script id="project-os-mission-contract" type="application/json">{"schema_version":1,"active":".agents/missions/MISSION-*.lock/meta.json","history":".agents/missions/history/","quarantine":".agents/missions/.quarantine/","automatic_stale_reclaim":false}</script>
+</body></html>

@@ -1,0 +1,5 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Resume snapshot contract</title></head><body>
+<main data-contract="resume-snapshots"><h1>Resume snapshots</h1><p><a href="CURRENT.html">CURRENT.html</a> is an atomic HTML projection with embedded JSON. Immutable canonical snapshots live under <code>snapshots/</code> and record mission, objective, active IDs, blocker, next gate, evidence, exact first-read order, creator, and prior snapshot.</p><p>Write the JSON snapshot first, then atomically advance the HTML pointer. Worker packets belong to their run.</p></main>
+<script id="project-os-resume-contract" type="application/json">{"schema_version":1,"projection":".agents/briefs/CURRENT.html","canonical":".agents/briefs/snapshots/*.snapshot.json","update_order":["snapshot","projection"]}</script>
+</body></html>

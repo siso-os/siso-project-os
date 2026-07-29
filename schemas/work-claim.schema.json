@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://siso.dev/schemas/project-os/work-claim.schema.json",
+  "title": "SISO Project OS Active Write Claim",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "task_id", "run_id", "unit_id", "actor", "seat", "attempt", "base_sha", "write_set", "state", "acquired_at", "acquire_receipt"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "id": { "type": "string", "pattern": "^CLAIM-[A-Za-z0-9][A-Za-z0-9._-]*$" },
+    "task_id": { "type": "string", "pattern": "^TASK-[0-9]{4}$" },
+    "run_id": { "type": "string", "pattern": "^RUN-[0-9]{4}-[0-9]{2}-[0-9]{2}-[a-z0-9][a-z0-9-]*$" },
+    "unit_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" },
+    "actor": { "type": "string", "minLength": 1 },
+    "seat": { "type": ["string", "null"], "minLength": 1 },
+    "attempt": { "type": "integer", "minimum": 1 },
+    "base_sha": { "type": "string", "minLength": 1 },
+    "write_set": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "state": { "type": "string", "enum": ["active", "released"] },
+    "acquired_at": { "type": "string", "format": "date-time" },
+    "acquire_receipt": { "$ref": "#/$defs/acquireReceipt" },
+    "released_at": { "type": "string", "format": "date-time" },
+    "release_receipt": { "$ref": "#/$defs/releaseReceipt" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "state": { "const": "released" } }, "required": ["state"] },
+      "then": { "required": ["released_at", "release_receipt"] }
+    }
+  ],
+  "$defs": {
+    "acquireReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["by", "at"],
+      "properties": {
+        "by": { "type": "string", "minLength": 1 },
+        "at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "releaseReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["by", "at", "kind", "ref"],
+      "properties": {
+        "by": { "type": "string", "minLength": 1 },
+        "at": { "type": "string", "format": "date-time" },
+        "kind": { "type": "string", "enum": ["verified", "blocked"] },
+        "ref": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}
