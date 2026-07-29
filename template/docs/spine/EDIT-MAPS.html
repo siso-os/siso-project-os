@@ -1,0 +1,36 @@
+<!-- project-os-meta
+{
+  "schema_version": 1,
+  "document_id": "spine.edit-maps",
+  "path": "docs/spine/EDIT-MAPS.html",
+  "title": "Edit maps",
+  "kind": "runbook",
+  "domain": "project-governance",
+  "status": "unverified",
+  "answers_question": "For a recurring change type, which files, boundaries, checks, and evidence should an agent use?",
+  "authority_key": null,
+  "owner": "project-maintainers",
+  "created_at": "2026-07-29",
+  "reviewed_at": null,
+  "review_due_at": null,
+  "canonical_pointer": null,
+  "supersedes": [],
+  "superseded_by": null,
+  "source_pointers": ["docs/spine/REPO-FACTS.html"],
+  "evidence": { "grade": "none", "observed_at": null, "proof_pointers": [], "verifier": null },
+  "tags": ["spine", "edit-maps", "verification"]
+}
+-->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Edit maps</title><style>body{font:15px/1.55 system-ui;max-width:70rem;margin:0 auto;padding:2rem;color:#17202a}header,section{border:1px solid #dce2ea;border-radius:1rem;padding:1.2rem;margin:1rem 0}pre{padding:1rem;background:#f3f5f8;border-radius:.7rem;overflow:auto}code{overflow-wrap:anywhere}@media(max-width:40rem){body{padding:.5rem}}</style></head>
+<body>
+  <header data-contract="edit-maps"><p>Authored runbook · status: unverified</p><h1>Edit maps</h1><p>Route a recurring change shape through normal files and the cheapest honest proof. An edit map never authorizes work or replaces a task.</p></header>
+  <section><h2>Global boundaries</h2><ul><li>Read the nearest <code>AGENTS.md</code>.</li><li>Preserve one canonical writer per record type.</li><li>Keep generated outputs out of authored inputs.</li><li>Name secrets and external systems as boundaries; never include values.</li><li>Escalate human authorization through the owning task.</li></ul></section>
+  <section data-contract="edit-map-example"><h2>Example: change a user-facing surface</h2><p><strong>Outcome:</strong> <code>UNKNOWN</code></p><h3>Normal files</h3><pre>UNKNOWN/source-entry
+UNKNOWN/state-or-data-contract
+UNKNOWN/closest-test</pre><h3>Dependency boundaries</h3><p><code>UNKNOWN</code></p><h3>Cheap verification</h3><pre>replace-with-the-smallest-project-specific-check</pre><h3>Full gate and observation</h3><pre>replace-with-the-project-release-or-smoke-check</pre><p>Record the result, source revision, real-surface observation, and evidence path in the task or linked run.</p></section>
+  <section><h2>Required fields for every map</h2><ol><li>Observable outcome and canonical task category.</li><li>Normal source, contract, and test paths.</li><li>Forbidden dependency or ownership crossings.</li><li>Cheapest useful deterministic check.</li><li>Broader smoke/manual observation and required environment.</li><li>Evidence destination and human gate.</li></ol></section>
+  <script id="edit-maps-contract" type="application/json">{"schema_version":1,"kind":"edit-maps","status":"unverified","map_fields":["outcome","normal_paths","boundaries","cheap_check","full_gate","evidence_destination","human_gate"]}</script>
+</body>
+</html>

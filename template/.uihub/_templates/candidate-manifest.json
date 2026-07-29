@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "campaign_id": "UI-0000",
+  "task_id": "TASK-0000",
+  "source_revision": "replace-with-source-revision",
+  "comparison_contract": {
+    "screen_ids": ["primary-screen"],
+    "copy_fixture": ".uihub/campaigns/UI-0000/research/fixtures/copy.json",
+    "data_fixture": ".uihub/campaigns/UI-0000/research/fixtures/data.json",
+    "shell": ".uihub/campaigns/UI-0000/research/shell.md",
+    "viewports": [
+      { "name": "wide", "width": 1280, "height": 800 },
+      { "name": "narrow", "width": 390, "height": 844 }
+    ]
+  },
+  "candidates": [
+    {
+      "id": "CAN-A",
+      "direction_id": "DIR-A",
+      "title": "Replace with candidate A",
+      "summary": "Replace with the material design difference",
+      "eligibility": "review_candidate",
+      "artifact": {
+        "path": ".uihub/campaigns/UI-0000/candidates/CAN-A/index.html",
+        "media_type": "text/html",
+        "alt": "Candidate A"
+      }
+    },
+    {
+      "id": "CAN-B",
+      "direction_id": "DIR-B",
+      "title": "Replace with candidate B",
+      "summary": "Replace with the material design difference",
+      "eligibility": "review_candidate",
+      "artifact": {
+        "path": ".uihub/campaigns/UI-0000/candidates/CAN-B/index.html",
+        "media_type": "text/html",
+        "alt": "Candidate B"
+      }
+    }
+  ]
+}

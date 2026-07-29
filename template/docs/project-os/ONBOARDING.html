@@ -1,0 +1,36 @@
+<!-- project-os-meta
+{
+  "schema_version": 1,
+  "document_id": "route.onboarding-html",
+  "path": "docs/project-os/ONBOARDING.html",
+  "title": "Human and agent onboarding",
+  "kind": "runbook",
+  "domain": "project-governance",
+  "status": "current",
+  "answers_question": "How does a human or agent adopt, cold-pick up, execute, verify, and hand off work in this repository?",
+  "authority_key": "route.project-os.onboarding-html",
+  "owner": "project-maintainers",
+  "created_at": "2026-07-29",
+  "reviewed_at": "2026-07-29",
+  "review_due_at": null,
+  "canonical_pointer": "docs/project-os/ONBOARDING.html",
+  "supersedes": [],
+  "superseded_by": null,
+  "source_pointers": ["AGENTS.md", "PROJECT-OS.html"],
+  "evidence": { "grade": "none", "observed_at": null, "proof_pointers": [], "verifier": null },
+  "tags": ["onboarding", "agents", "humans", "migration"]
+}
+-->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Human and agent onboarding</title><style>:root{font-family:system-ui;color:#17202a;background:#f5f7fa}body{margin:0}main{width:min(76rem,calc(100% - 2rem));margin:auto;padding:2rem 0 4rem}header,section{background:#fff;border:1px solid #dce2ea;border-radius:1rem;padding:1.2rem;margin:1rem 0}.owners{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.owner{border-left:4px solid #5276a7;padding-left:1rem}code{overflow-wrap:anywhere}li{margin:.45rem 0}@media(max-width:48rem){main{width:min(100% - 1rem,76rem);padding-top:.5rem}.owners{grid-template-columns:1fr}}</style></head>
+<body><main>
+  <header data-contract="onboarding"><p>Canonical authored guide</p><h1>Human and agent onboarding</h1><p>Use the same operating truth while preserving one writer for every record type.</p></header>
+  <section data-contract="ownership"><h2>Ownership boundary</h2><div class="owners"><div class="owner"><h3>Project OS</h3><p>Tasks, sprints, runs, packets, memory, docs routes, UI campaigns, schemas, checks, and projections.</p></div><div class="owner"><h3>Agent Base</h3><p>Shared skills, lane/model routing, spawning, supervision, messaging, telemetry, and persistent panes.</p></div><div class="owner"><h3>Project-local adapters</h3><p>Product commands, browser/generation helpers, tracker bridges, deployment checks, security policy, and domain skills.</p></div></div><p>No owner may create a second backlog or hidden approval store.</p></section>
+  <section data-contract="agent-cold-pickup"><h2>Agent cold pickup</h2><ol><li>Read root and nearest <code>AGENTS.md</code>.</li><li>Read <code>PROJECT-OS.html</code>.</li><li>Run <code>project-os onboard --json</code>; stop on integrity errors.</li><li>Select an unblocked canonical <code>task.json</code> and its linked run packet; read events, evidence, sprint, and run state.</li><li>Consult repo facts, edit maps, current docs, decisions, proof, prior runs, research dead ends, and memory.</li><li>Choose a declared capability route. Use Agent Base for live execution and project-local adapters at the product edge.</li><li>State back outcome, task, write fence, dependencies, human gates, verification, and return destination.</li><li>Verify, classify durable outputs, rebuild, check, and hand off from repository evidence.</li></ol></section>
+  <section data-contract="human-pickup"><h2>Human pickup</h2><p>Open <code>.project-os/generated/onboarding.html</code>. Address explicit human gates, blockers, and UI review first. Record judgments in the owning task or decision record, then rebuild; never edit generated HTML.</p></section>
+  <section data-contract="greenfield"><h2>Greenfield adoption</h2><ol><li>Initialize with project name, timeless summary, and desired outcome.</li><li>Inspect the generated cockpit and JSON health report.</li><li>Verify and promote <code>REPO-FACTS.html</code> and <code>EDIT-MAPS.html</code>.</li><li>Declare capability routes without copying shared runtime skills.</li><li>Create one outcome-shaped task; add sprint/run coordination only when needed.</li></ol></section>
+  <section data-contract="existing-migration"><h2>Existing-repository migration</h2><ol><li>Inventory rules, task authority, docs, capabilities, generated paths, verification, UI artifacts, trackers, and archive policy without mutation.</li><li>Choose one writer per concern and use one-way adapters for retained external authorities.</li><li>Merge the staged agent rules deliberately.</li><li>Classify knowledge through reviewed move manifests; adopt active work before bulk history.</li><li>Inventory project capabilities and route shared runtime behavior to Agent Base.</li><li>Model only active UI decisions; retain old galleries as evidence or archive.</li><li>Build, inspect, check, and cut over one canonical route at a time.</li></ol><p>Unresolved collisions stop that boundary without damaging the existing repository.</p></section>
+  <section data-contract="ui-closeout"><h2>UI decision and proof</h2><p>A complete campaign has a bounded candidate manifest, deterministic review projection, imported response, exhaustive decision, chosen-direction implementation, same-commit verification, and a task-evidence fold resolved by task ID plus stable evidence filename. Campaign verification never closes the task.</p></section>
+  <section data-contract="handoff"><h2>Handoff gate</h2><ol><li>Update canonical task/run records.</li><li>Attach commands, revision, and observed evidence.</li><li>Classify decisions, docs, memory, task evidence, and raw history.</li><li>Run <code>project-os build</code> and read-only <code>project-os check --json</code>.</li><li>Report PASS, FAIL, BLOCKED, or not-observed with the next canonical record.</li></ol></section>
+</main><script id="onboarding-contract" type="application/json">{"schema_version":1,"kind":"human-agent-onboarding","canonical":true,"contracts":["ownership","agent-cold-pickup","human-pickup","greenfield","existing-migration","ui-closeout","handoff"],"writers":{"project_state":"project-os","runtime":"agent-base","product_edges":"project-local-adapters"}}</script></body></html>

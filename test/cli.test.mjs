@@ -118,10 +118,10 @@ test('onboard is read-only and projects human attention separately from unblocke
   assert.match(onboarding, /version:'project-os-cockpit\.v1'/)
   assert.match(onboarding, /p,footer,code,a\{overflow-wrap:anywhere\}/)
 
-  const orderedTokens = ['AGENTS.md', 'PROJECT-OS.md', 'project-os onboard --json', 'task.json', 'linked run packet', 'Verify']
+  const orderedTokens = ['AGENTS.md', 'PROJECT-OS', 'project-os onboard --json', 'task.json', 'linked run packet', 'Verify']
   for (const source of [
     await readFile(join(root, 'AGENTS.md'), 'utf8'),
-    await readFile(join(root, 'docs', 'project-os', 'ONBOARDING.md'), 'utf8'),
+    await readFile(join(root, 'docs', 'project-os', 'ONBOARDING.html'), 'utf8'),
     onboarding,
   ]) {
     const normalized = source.replace(/\s+/g, ' ')
@@ -165,7 +165,7 @@ test('cockpit bounds the visible task trunk while preserving the full count', ()
 test('init refuses ordinary collisions without leaving a partial install', async (t) => {
   const root = await mkdtemp(join(tmpdir(), 'siso-project-os-collision-'))
   t.after(() => rm(root, { recursive: true, force: true }))
-  await writeFile(join(root, 'PROJECT-OS.md'), 'existing\n', 'utf8')
+  await writeFile(join(root, 'PROJECT-OS.html'), 'existing\n', 'utf8')
   run(['init', root], 2)
   await assert.rejects(readFile(join(root, '.project-os', 'project.json'), 'utf8'))
 })
@@ -298,7 +298,7 @@ test('knowledge checks reject meaningless ledgers and broken proof or document p
   await writeFile(join(root, 'docs', 'ledgers', 'decisions.jsonl'), '{}\n', 'utf8')
   await writeFile(join(root, 'docs', 'ledgers', 'runs.jsonl'), '{}\n', 'utf8')
 
-  const source = await readFile(join(root, 'docs', 'domains', 'INDEX.md'), 'utf8')
+  const source = await readFile(join(root, 'docs', 'domains', 'INDEX.html'), 'utf8')
   const match = source.match(/<!-- project-os-meta\s*\n([\s\S]*?)\n-->/)
   const metadata = JSON.parse(match[1])
   metadata.document_id = 'domain.stale-fixture'
@@ -308,7 +308,7 @@ test('knowledge checks reject meaningless ledgers and broken proof or document p
   metadata.authority_key = null
   metadata.canonical_pointer = 'docs/domains/missing-current.md'
   metadata.superseded_by = 'docs/domains/missing-current.md'
-  const stale = source.replace(match[1], JSON.stringify(metadata, null, 2)).replace('# Domain knowledge', '# Stale fixture')
+  const stale = source.replace(match[1], JSON.stringify(metadata, null, 2)).replace('<h1>Domain knowledge</h1>', '<h1>Stale fixture</h1>')
   await writeFile(join(root, metadata.path), stale, 'utf8')
 
   const claim = {
@@ -385,8 +385,8 @@ test('UI campaign advances through grounded artifacts, decision, implementation,
   const task = JSON.parse(run(['task', 'create', '--root', root, '--title', 'UI lifecycle owner', '--json']).stdout)
   const campaign = JSON.parse(run(['ui', 'create', '--root', root, '--title', 'UI lifecycle', '--task', task.id, '--surface', 'settings', '--json']).stdout)
   const campaignRoot = join(root, '.uihub', 'campaigns', campaign.id)
-  const researchPath = `.uihub/campaigns/${campaign.id}/research/findings.md`
-  await writeFile(join(root, researchPath), '# Grounded findings\n', 'utf8')
+  const researchPath = `.uihub/campaigns/${campaign.id}/research/findings.html`
+  await writeFile(join(root, researchPath), '<!doctype html><title>Grounded findings</title>\n', 'utf8')
 
   for (const id of ['DIR-A', 'DIR-B']) {
     const direction = JSON.parse(await readFile(join(repoRoot, 'template', '.uihub', '_templates', 'direction.json'), 'utf8'))

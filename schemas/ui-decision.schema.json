@@ -73,6 +73,17 @@
     "review_response": {
       "$ref": "#/$defs/relativePath"
     },
+    "candidate_manifest": {
+      "$ref": "#/$defs/relativePath"
+    },
+    "candidate_manifest_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{64}$"
+    },
+    "review_response_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{64}$"
+    },
     "implementation_target": {
       "type": "object",
       "additionalProperties": false,

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "campaign_id": "UI-0000",
+  "task_id": "TASK-0000",
+  "candidate_manifest": ".uihub/campaigns/UI-0000/candidates/manifest.json",
+  "candidate_manifest_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "selected_direction_id": "DIR-A",
+  "rejected_direction_ids": ["DIR-B"],
+  "reviewer": { "name": "replace-me", "role": "product owner" },
+  "recorded_at": "2000-01-01T00:00:00Z",
+  "rationale": "Replace with the reviewer's reason for this selection.",
+  "verbatim_notes": []
+}

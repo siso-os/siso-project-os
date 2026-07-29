@@ -4,6 +4,13 @@ import { join } from 'node:path'
 import { UI_STAGES, isoNow, listDirectories, pathExists, readJson, resolveProjectPointer, splitList, withExclusiveLock, writeJsonAtomic } from './shared.mjs'
 import { assertProjectRecord } from './schema.mjs'
 import { findTask } from './work.mjs'
+import { uiCandidateManifestProblems, uiDecisionCompletenessProblems, uiReceiptLinkProblems, uiReviewResponseProblems, uiTaskEvidenceProblems } from './ui-contracts.mjs'
+
+function htmlEscape(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (character) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  }[character]))
+}
 
 async function nextCampaignId(base) {
   let maximum = 0
@@ -26,7 +33,7 @@ export async function createUiCampaign(root, flags) {
     const id = await nextCampaignId(base)
     const timestamp = isoNow(flags)
     const by = typeof flags.by === 'string' ? flags.by : 'human'
-    const intentPath = `.uihub/campaigns/${id}/intent/brief.md`
+    const intentPath = `.uihub/campaigns/${id}/intent/brief.html`
     const campaign = {
       schema_version: 1,
       id,
@@ -47,9 +54,20 @@ export async function createUiCampaign(root, flags) {
       await mkdir(join(directory, child), { recursive: true })
       await writeFile(join(directory, child, '.gitkeep'), '', 'utf8')
     }
-    const brief = `# ${title}\n\n- Canonical task: ${taskId}\n- Surface: ${campaign.surface}\n- Audience: ${typeof flags.audience === 'string' ? flags.audience : 'TBD'}\n- Primary job: ${typeof flags.job === 'string' ? flags.job : 'TBD'}\n- Source revision: ${typeof flags.commit === 'string' ? flags.commit : 'TBD'}\n`
+    const briefState = {
+      schema_version: 1,
+      campaign_id: id,
+      task_id: taskId,
+      surface: campaign.surface,
+      audience: typeof flags.audience === 'string' ? flags.audience : 'TBD',
+      primary_job: typeof flags.job === 'string' ? flags.job : 'TBD',
+      source_revision: typeof flags.commit === 'string' ? flags.commit : 'TBD',
+      canonical_writer: false,
+    }
+    const briefJson = JSON.stringify(briefState).replace(/</g, '\\u003c')
+    const brief = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${htmlEscape(title)} — UI intent</title><style>body{font:15px/1.55 system-ui;max-width:68rem;margin:auto;padding:2rem;color:#17202a}dl{display:grid;grid-template-columns:max-content 1fr;gap:.5rem 1rem}dd{margin:0}@media(max-width:40rem){body{padding:.5rem}dl{grid-template-columns:1fr}}</style></head><body><main data-contract="ui-intent"><h1>${htmlEscape(title)}</h1><dl><dt>Canonical task</dt><dd><code>${htmlEscape(taskId)}</code></dd><dt>Surface</dt><dd>${htmlEscape(briefState.surface)}</dd><dt>Audience</dt><dd>${htmlEscape(briefState.audience)}</dd><dt>Primary job</dt><dd>${htmlEscape(briefState.primary_job)}</dd><dt>Source revision</dt><dd><code>${htmlEscape(briefState.source_revision)}</code></dd></dl><p>Expand this authored brief with current truth, scope, acceptance, and open questions before advancing.</p></main><script id="ui-intent-contract" type="application/json">${briefJson}</script></body></html>\n`
     await assertProjectRecord(root, 'ui-campaign', campaign)
-    await writeFile(join(directory, 'intent', 'brief.md'), brief, 'utf8')
+    await writeFile(join(directory, 'intent', 'brief.html'), brief, 'utf8')
     await writeJsonAtomic(join(directory, 'campaign.json'), campaign)
     return campaign
   })
@@ -101,9 +119,23 @@ export async function advanceUiCampaign(root, id, flags) {
       if (!(await pathExists(join(entry.directory, 'candidates', candidateId)))) throw new Error(`missing candidate artifact: ${candidateId}`)
     }
     entry.campaign.candidate_ids = candidates
+    if (typeof flags.manifest === 'string') {
+      entry.campaign.candidate_manifest = await requirePointer(root, flags.manifest, 'candidates stage --manifest must reference a candidate manifest')
+      const manifest = await readJson(resolveProjectPointer(root, entry.campaign.candidate_manifest))
+      await assertProjectRecord(root, 'ui-candidate-manifest', manifest)
+      const problems = await uiCandidateManifestProblems(root, entry.campaign, manifest)
+      if (problems.length > 0) throw new Error(`candidate manifest is incomplete:\n${problems.map((problem) => `- ${problem}`).join('\n')}`)
+    }
   }
   if (requested === 'review') {
     entry.campaign.review_path = await requirePointer(root, flags.review, 'review stage requires --review <path>')
+    if (entry.campaign.candidate_manifest) {
+      const manifest = await readJson(resolveProjectPointer(root, entry.campaign.candidate_manifest))
+      const response = await readJson(resolveProjectPointer(root, entry.campaign.review_path))
+      await assertProjectRecord(root, 'ui-review-response', response)
+      const problems = uiReviewResponseProblems(entry.campaign, manifest, response)
+      if (problems.length > 0) throw new Error(`review response is incomplete:\n${problems.map((problem) => `- ${problem}`).join('\n')}`)
+    }
     receipt = entry.campaign.review_path
   }
   if (requested === 'decided') {
@@ -118,6 +150,16 @@ export async function advanceUiCampaign(root, id, flags) {
       if (!entry.campaign.direction_ids.includes(directionId)) throw new Error(`decision rejects unknown direction ${directionId}`)
     }
     if ((decisionRecord.rejected_direction_ids ?? []).includes(decisionRecord.chosen_direction_id)) throw new Error('decision cannot both choose and reject the same direction')
+    const accountedDirections = [decisionRecord.chosen_direction_id, ...(decisionRecord.rejected_direction_ids ?? [])]
+    if (new Set(accountedDirections).size !== accountedDirections.length || accountedDirections.length !== entry.campaign.direction_ids.length || entry.campaign.direction_ids.some((directionId) => !accountedDirections.includes(directionId))) {
+      throw new Error('decision must choose or reject every campaign direction exactly once')
+    }
+    if (entry.campaign.candidate_manifest) {
+      const manifest = await readJson(resolveProjectPointer(root, entry.campaign.candidate_manifest))
+      const response = await readJson(resolveProjectPointer(root, entry.campaign.review_path))
+      const problems = uiDecisionCompletenessProblems(entry.campaign, manifest, response, decisionRecord)
+      if (problems.length > 0) throw new Error(`decision is incomplete:\n${problems.map((problem) => `- ${problem}`).join('\n')}`)
+    }
     receipt = entry.campaign.decision_record
   }
   if (requested === 'implemented') {
@@ -127,6 +169,8 @@ export async function advanceUiCampaign(root, id, flags) {
     assertLinkedRecord(entry.campaign, implementation, 'implementation receipt')
     if (implementation.kind !== 'implementation' || implementation.verdict !== 'pass') throw new Error('implemented stage requires a passing implementation receipt')
     await assertReceiptSemantics(root, entry.campaign, implementation, 'implementation')
+    const decision = await readJson(resolveProjectPointer(root, entry.campaign.decision_record))
+    if (implementation.direction_id !== decision.chosen_direction_id) throw new Error(`implementation receipt is for ${implementation.direction_id}, not chosen direction ${decision.chosen_direction_id}`)
     receipt = entry.campaign.implementation_receipt
   }
   if (requested === 'verified') {
@@ -136,6 +180,18 @@ export async function advanceUiCampaign(root, id, flags) {
     assertLinkedRecord(entry.campaign, verification, 'verification receipt')
     if (verification.kind !== 'verification' || verification.verdict !== 'pass') throw new Error('verified stage requires a passing verification receipt')
     await assertReceiptSemantics(root, entry.campaign, verification, 'verification')
+    const decision = await readJson(resolveProjectPointer(root, entry.campaign.decision_record))
+    const implementation = await readJson(resolveProjectPointer(root, entry.campaign.implementation_receipt))
+    const linkageProblems = uiReceiptLinkProblems(entry.campaign, decision, implementation, verification)
+    if (linkageProblems.length > 0) throw new Error(`verification receipt linkage is incomplete:\n${linkageProblems.map((problem) => `- ${problem}`).join('\n')}`)
+    const foldPointer = flags.fold ?? flags['task-evidence']
+    if (typeof foldPointer === 'string') {
+      entry.campaign.task_evidence_receipt = await requirePointer(root, foldPointer, 'verified stage task evidence pointer is invalid')
+      const fold = await readJson(resolveProjectPointer(root, entry.campaign.task_evidence_receipt))
+      await assertProjectRecord(root, 'ui-task-evidence', fold)
+      const foldProblems = await uiTaskEvidenceProblems(root, entry.campaign, fold)
+      if (foldProblems.length > 0) throw new Error(`task evidence fold is incomplete:\n${foldProblems.map((problem) => `- ${problem}`).join('\n')}`)
+    }
     receipt = entry.campaign.verification_receipt
   }
   if (requested === 'superseded') {
@@ -186,11 +242,28 @@ export async function uiReceiptProblems(root, campaign, record, expectedKind) {
     for (const path of [...(detail.target_paths ?? []), ...(detail.changed_files ?? [])]) {
       if (!(await pointerExists(root, path))) problems.push(`implementation path does not exist: ${path}`)
     }
+    if (campaign.decision_record) {
+      try {
+        const decision = await readJson(resolveProjectPointer(root, campaign.decision_record))
+        if (record.direction_id !== decision.chosen_direction_id) problems.push(`implementation direction ${record.direction_id} differs from chosen ${decision.chosen_direction_id}`)
+      } catch (error) {
+        problems.push(`implementation cannot resolve decision: ${error.message}`)
+      }
+    }
   }
   if (expectedKind === 'verification') {
     for (const evidence of detail.visual_evidence ?? []) await inspectEvidence(root, evidence.path, evidence.sha256, problems)
     for (const [fault, count] of Object.entries(detail.browser_faults ?? {})) {
       if (count !== 0 && !excepted(fault)) problems.push(`${fault} is ${count}`)
+    }
+    if (campaign.decision_record && campaign.implementation_receipt) {
+      try {
+        const decision = await readJson(resolveProjectPointer(root, campaign.decision_record))
+        const implementation = await readJson(resolveProjectPointer(root, campaign.implementation_receipt))
+        problems.push(...uiReceiptLinkProblems(campaign, decision, implementation, record))
+      } catch (error) {
+        problems.push(`verification cannot resolve implementation linkage: ${error.message}`)
+      }
     }
   }
   return problems

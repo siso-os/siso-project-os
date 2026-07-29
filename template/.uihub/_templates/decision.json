@@ -14,6 +14,9 @@
   },
   "approved_at": "2000-01-01T00:00:00Z",
   "review_response": ".uihub/campaigns/UI-0000/review/response.json",
+  "candidate_manifest": ".uihub/campaigns/UI-0000/candidates/manifest.json",
+  "candidate_manifest_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "review_response_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
   "implementation_target": {
     "surface": "Replace with the real application surface",
     "paths": [

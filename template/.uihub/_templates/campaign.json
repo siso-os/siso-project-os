@@ -5,7 +5,7 @@
   "title": "Replace with the campaign title",
   "surface": "Replace with the real application surface",
   "stage": "intent",
-  "intent_path": ".uihub/campaigns/UI-0000/intent/brief.md",
+  "intent_path": ".uihub/campaigns/UI-0000/intent/brief.html",
   "direction_ids": [],
   "candidate_ids": [],
   "created_at": "2000-01-01T00:00:00Z",

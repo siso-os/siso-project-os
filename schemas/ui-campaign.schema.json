@@ -67,6 +67,9 @@
       },
       "uniqueItems": true
     },
+    "candidate_manifest": {
+      "$ref": "#/$defs/relativePath"
+    },
     "review_path": {
       "$ref": "#/$defs/relativePath"
     },
@@ -77,6 +80,9 @@
       "$ref": "#/$defs/relativePath"
     },
     "verification_receipt": {
+      "$ref": "#/$defs/relativePath"
+    },
+    "task_evidence_receipt": {
       "$ref": "#/$defs/relativePath"
     },
     "superseded": {

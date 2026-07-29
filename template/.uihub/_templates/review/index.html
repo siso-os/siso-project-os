@@ -168,7 +168,7 @@
     </style>
   </head>
   <body>
-    <main data-campaign-id="UI-0000" data-task-id="TASK-0000">
+    <main data-campaign-id="UI-0000" data-task-id="TASK-0000" data-candidate-manifest=".uihub/campaigns/UI-0000/candidates/manifest.json" data-candidate-manifest-sha256="0000000000000000000000000000000000000000000000000000000000000000">
       <p class="eyebrow">Static review · replace all placeholders</p>
       <h1>Campaign title</h1>
       <p>Review the same screen, copy, data, shell, and viewport across meaningfully different directions.</p>
@@ -219,6 +219,14 @@
             <input type="text" name="reviewer" autocomplete="name" required>
           </label>
           <label>
+            <span>Reviewer role</span>
+            <input type="text" name="reviewer_role" required>
+          </label>
+          <label>
+            <span>Rationale</span>
+            <textarea name="rationale" rows="4" required></textarea>
+          </label>
+          <label>
             <span>Verbatim notes</span>
             <textarea name="notes" rows="6" placeholder="Write the reviewer's words without interpretation."></textarea>
           </label>
@@ -243,10 +251,16 @@
           schema_version: 1,
           campaign_id: main.dataset.campaignId,
           task_id: main.dataset.taskId,
+          candidate_manifest: main.dataset.candidateManifest,
+          candidate_manifest_sha256: main.dataset.candidateManifestSha256,
           selected_direction_id: selectedDirectionId,
           rejected_direction_ids: allDirectionIds.filter((id) => id !== selectedDirectionId),
-          reviewer: String(data.get('reviewer')).trim(),
+          reviewer: {
+            name: String(data.get('reviewer')).trim(),
+            role: String(data.get('reviewer_role')).trim()
+          },
           recorded_at: new Date().toISOString(),
+          rationale: String(data.get('rationale')).trim(),
           verbatim_notes: String(data.get('notes')).split('\n').filter(Boolean)
         };
         const blob = new Blob([`${JSON.stringify(response, null, 2)}\n`], {

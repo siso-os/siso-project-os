@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "FOLD-UI-0000-VERIFIED",
+  "campaign_id": "UI-0000",
+  "task_id": "TASK-0000",
+  "decision_record": ".uihub/campaigns/UI-0000/decided/decision.json",
+  "implementation_receipt": ".uihub/campaigns/UI-0000/implemented/receipt.json",
+  "verification_receipt": ".uihub/campaigns/UI-0000/verified/receipt.json",
+  "source_commit": "0000000",
+  "verdict": "promoted",
+  "task_evidence_file": "UI-0000-verified.json",
+  "promoted_at": "2000-01-01T00:00:00Z",
+  "promoted_by": "replace-me",
+  "remaining_work": []
+}

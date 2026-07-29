@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://siso.dev/schemas/ui-task-evidence.schema.json",
+  "title": "UI Lab task evidence fold",
+  "description": "Receipt proving a verified UI campaign was promoted into its canonical task evidence without closing the task implicitly.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "campaign_id", "task_id", "decision_record", "implementation_receipt", "verification_receipt", "source_commit", "verdict", "task_evidence_file", "promoted_at", "promoted_by", "remaining_work"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "id": { "type": "string", "pattern": "^FOLD-UI-[0-9]{4}-[A-Z0-9][A-Z0-9-]*$" },
+    "campaign_id": { "type": "string", "pattern": "^UI-[0-9]{4}$" },
+    "task_id": { "type": "string", "pattern": "^TASK-[0-9]{4}$" },
+    "decision_record": { "$ref": "#/$defs/relativePath" },
+    "implementation_receipt": { "$ref": "#/$defs/relativePath" },
+    "verification_receipt": { "$ref": "#/$defs/relativePath" },
+    "source_commit": { "type": "string", "pattern": "^[0-9a-fA-F]{7,64}$" },
+    "verdict": { "const": "promoted" },
+    "task_evidence_file": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*\\.json$" },
+    "promoted_at": { "type": "string", "format": "date-time" },
+    "promoted_by": { "type": "string", "minLength": 1 },
+    "remaining_work": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+  },
+  "$defs": {
+    "relativePath": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?![A-Za-z]:[\\\\/]).+" }
+  }
+}

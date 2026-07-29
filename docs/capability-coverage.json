@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "source_scope": "sanitized-protected-evidence",
+  "policy": "Every reusable operating concern is explicitly installed, delegated, kept project-local, exposed through an adapter, or omitted. Exact source paths and source-specific facts remain in a private run ledger.",
+  "areas": [
+    { "id": "boot-routing", "concern": "One runtime rule shim pointing to one HTML operating map", "disposition": "install", "public_surfaces": ["template/AGENTS.md", "template/PROJECT-OS.html"] },
+    { "id": "runtime-boundary", "concern": "Agent spawning, supervision, messaging, and teardown", "disposition": "depend", "runtime_routes": ["subagents", "conduct", "orchestrate", "herdr", "agent-comms"] },
+    { "id": "capability-discovery", "concern": "Project skills, roles, commands, recipes, and verification adapters", "disposition": "install", "public_surfaces": ["declared capability inventory", "generated capability routes"] },
+    { "id": "specialist-roles", "concern": "Engine-neutral specialist role discovery", "disposition": "install", "public_surfaces": ["project role manifest", "generated role inventory"] },
+    { "id": "task-lifecycle", "concern": "Canonical work identity and lifecycle", "disposition": "install", "public_surfaces": [".agents/tasks", "task schemas and commands"] },
+    { "id": "run-coordination", "concern": "Sprints, runs, packets, gates, returns, and closeout", "disposition": "install", "public_surfaces": [".agents/sprints", ".agents/runs"] },
+    { "id": "resume-and-mission", "concern": "Structured resume history and active mission ownership", "disposition": "install", "public_surfaces": [".agents/briefs", "generated resume history"] },
+    { "id": "documentation-routing", "concern": "Question-oriented durable documentation discovery", "disposition": "install", "public_surfaces": ["docs/project-os", "generated docs corpus"] },
+    { "id": "repo-facts", "concern": "Durable technical breadcrumbs that are not status", "disposition": "install", "public_surfaces": ["docs/spine/REPO-FACTS.html"] },
+    { "id": "edit-maps", "concern": "Change-shaped file, boundary, and verification routes", "disposition": "install", "public_surfaces": ["docs/spine/EDIT-MAPS.html"] },
+    { "id": "decisions", "concern": "Binding choices and supersession", "disposition": "install", "public_surfaces": ["docs/ledgers/decisions.jsonl", "decision schema"] },
+    { "id": "proof-currency", "concern": "Evidence grade, provenance, and decay", "disposition": "install", "public_surfaces": ["docs/ledgers/proofs.jsonl", "claim schema"] },
+    { "id": "prior-run-discovery", "concern": "Discovery of earlier attempts and outcomes", "disposition": "install", "public_surfaces": ["run records", "joined onboarding projection"] },
+    { "id": "research-and-dead-ends", "concern": "Research coverage, gaps, and known dead ends", "disposition": "install", "public_surfaces": ["research packet schema", "joined onboarding projection"] },
+    { "id": "anti-amnesia", "concern": "Joined view of stale proof, dead ends, unresolved runs, and memory", "disposition": "install", "public_surfaces": ["generated joined onboarding JSON and HTML"] },
+    { "id": "durable-memory", "concern": "One reusable fact per project memory record", "disposition": "install", "public_surfaces": [".agents/memory"] },
+    { "id": "ui-campaigns", "concern": "Task-linked UI intent, divergence, candidates, review, decision, and proof", "disposition": "install", "public_surfaces": [".uihub/campaigns", "UI schemas and deterministic projections"] },
+    { "id": "verification-and-landing", "concern": "Independent verification, landing, and task evidence promotion", "disposition": "install", "public_surfaces": ["receipt schemas", "task evidence fold"] },
+    { "id": "archive", "concern": "Recoverable historical disposition", "disposition": "install", "public_surfaces": ["archive manifests", "read-only archive inventory"] },
+    { "id": "timeline", "concern": "Narrative project timeline", "disposition": "omit", "boundary": "Optional authored domain document; do not infer a universal story from mixed records." },
+    { "id": "security-playbooks", "concern": "Product safety, access, and operator policy", "disposition": "project_local", "boundary": "The project authors its own policy and proof; the package supplies only homes and generic receipt types." },
+    { "id": "fleet-runtime", "concern": "Models, budgets, terminals, telemetry, and persistent workers", "disposition": "depend", "runtime_routes": ["model-routing", "telemetry", "herdr", "orchestrate"] },
+    { "id": "code-context", "concern": "Code-layout annotations and semantic context graph", "disposition": "depend", "runtime_routes": ["agent-architecture", "siso-codex", "semantic code search"] },
+    { "id": "external-adapters", "concern": "Optional generation, browser, deployment, and tracker integrations", "disposition": "adapter", "boundary": "Adapters declare capability and receipts; they never become required canonical writers." }
+  ]
+}

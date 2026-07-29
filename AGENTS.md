@@ -1,13 +1,13 @@
 # SISO Project OS — Agent Rules
 
 This repository packages reusable per-project operating infrastructure distilled from a
-protected source project. The source is evidence, never a write target; see `docs/provenance.md`.
+protected source project. The source is evidence, never a write target; see `docs/provenance.html`.
 
 ## Start here
 
 1. `SPEC.md` — scope, contracts, and acceptance criteria.
 2. `README.md` — user-facing adoption path.
-3. `docs/work-lifecycle.md`, `docs/knowledge-spine.md`, and `docs/ui-loop.md` — the three operating packs.
+3. `docs/work-lifecycle.md`, `docs/knowledge-spine.html`, and `docs/ui-loop.html` — the three operating packs.
 
 ## Invariants
 
@@ -17,7 +17,7 @@ protected source project. The source is evidence, never a write target; see `doc
 - New task IDs are allocated under an exclusive lock and validated across every lifecycle folder.
 - Every sprint, run, and UI campaign references canonical task IDs.
 - Durable knowledge is one fact per memory file. Run packets are ephemeral execution contracts.
-- Boot and rules documents are Markdown. Generated state/report surfaces may be HTML or JSON.
+- Only runtime-required `AGENTS.md`/`CLAUDE.md` shims remain Markdown. Authored operating surfaces are deterministic HTML; canonical machine records are JSON/JSONL.
 - The package is generic: never copy source-product names, credentials, customer facts, or bulk history.
 - Preserve unrelated work. Multiple agents may edit different owned directories concurrently.
 

@@ -33,7 +33,7 @@ for (const file of await walkFiles(packageRoot)) {
 }
 
 const documentSchema = JSON.parse(await readFile(join(schemasRoot, 'document.schema.json'), 'utf8'))
-for (const file of (await walkFiles(join(templateRoot, 'docs'))).filter((path) => path.endsWith('.md'))) {
+for (const file of (await walkFiles(join(templateRoot, 'docs'))).filter((path) => /\.(?:html|md)$/.test(path))) {
   const content = await readFile(join(templateRoot, 'docs', file), 'utf8')
   const match = content.match(/<!-- project-os-meta\s*\n([\s\S]*?)\n-->/)
   if (!match) failures.push(`missing project-os-meta in template/docs/${file}`)
