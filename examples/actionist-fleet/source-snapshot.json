@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "snapshot_id": "ACTIONIST-PUBLIC-FIXTURE-V1",
+  "classification": "public-safe-derived-observation",
+  "source_revision": "synthetic-actionist-fixture-v1",
+  "source_revision_kind": "synthetic_fixture",
+  "programme_state": "active-control-plane",
+  "readiness": "hold",
+  "observed_capabilities": [
+    "programme intent and dependency graph",
+    "exclusive domain and worktree ownership",
+    "Herdr durable process identities",
+    "Sol persistent goals",
+    "durable callbacks and handoffs",
+    "machine placement and disk gates",
+    "read-only Front Door projection"
+  ],
+  "observed_gaps": [
+    "canonical materialization incomplete",
+    "independent programme verifier unstaffed",
+    "admission decisions not normalized as portable receipts",
+    "runtime contracts tied to one programme layout"
+  ],
+  "authority_boundaries": {
+    "programme_truth": "external Actionist programme artifacts",
+    "identity_and_placement": "Great Library",
+    "process_control": "Herdr",
+    "dogfood": "temporary Project OS rehearsal only"
+  }
+}

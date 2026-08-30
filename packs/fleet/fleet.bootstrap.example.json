@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "pack_version": "1.0.0",
+  "programme": {
+    "id": "PROGRAM-example",
+    "name": "Example Engineering Fleet",
+    "summary": "A bounded, evidence-gated engineering programme.",
+    "desired_outcome": "Every admitted task lands through independent verification with recoverable evidence.",
+    "owner": "project-lead",
+    "evidence_root": ".agents/fleet/evidence",
+    "callback_ledger": ".agents/fleet/callbacks.ndjson"
+  },
+  "repositories": [
+    {
+      "id": "primary",
+      "url": "https://github.com/example/project.git",
+      "root": ".",
+      "remote": "origin",
+      "base_branch": "main",
+      "worktree_mode": "isolated",
+      "write_policy": "work-claim-required"
+    }
+  ],
+  "domains": [
+    {
+      "id": "product",
+      "title": "Product implementation",
+      "owner": "product-lead",
+      "owner_role": "fleet-domain-owner",
+      "verifier_role": "fleet-verifier",
+      "repository_id": "primary",
+      "write_paths": ["src", "test"],
+      "evidence_paths": [".agents/fleet/evidence/product"]
+    }
+  ],
+  "policy": {
+    "capacity": {
+      "max_live": 4,
+      "verifier_ratio": 0.25,
+      "verifier_reserve": 1,
+      "max_pending_verifications": 2
+    },
+    "heartbeat": {
+      "stale_after_seconds": 300,
+      "recovery_requires_checkpoint": true
+    },
+    "admission": {
+      "require_clean_worktree": true,
+      "require_evidence_path": true,
+      "require_repository_boundary": true
+    },
+    "qualification": {
+      "independent_verifier": true,
+      "require_candidate_sha": true,
+      "require_evidence_refs": true
+    }
+  },
+  "machines": [
+    {
+      "id": "lead-machine",
+      "host_class": "other",
+      "roles": ["lead", "worker", "verifier", "portfolio", "front-door", "maintenance", "fleet-verifier"],
+      "max_live": 4,
+      "preference": 1,
+      "thresholds": {
+        "minimum_available_disk_bytes": 1073741824,
+        "minimum_available_memory_bytes": 536870912,
+        "maximum_load_per_cpu": 4,
+        "require_ac_power": false
+      }
+    }
+  ],
+  "bootstrap_machine_id": "lead-machine",
+  "process_controller": {
+    "provider": "herdr",
+    "workspace": "example-fleet",
+    "durable_identity_field": "terminal_id",
+    "volatile_identity_fields": ["pane_id", "process_id"],
+    "lead_profile": "gpt-5.6-sol",
+    "worker_profile": "gpt-5.6-luna",
+    "worker_reasoning_effort": "max",
+    "callback_transport": "provider-message-plus-callback-ledger"
+  },
+  "front_door": {
+    "consumer": "mission-control",
+    "projection_root": ".agents/fleet/generated",
+    "source_contract": ".agents/fleet/SOURCE-CONTRACT.json"
+  }
+}

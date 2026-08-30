@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "id": "PACKET-template-luna-task",
+  "to": "fleet-implementer-or-verifier",
+  "from": "fleet-domain-owner",
+  "thread": "Replace with the parent programme thread.",
+  "objective": "Replace with one bounded task outcome.",
+  "state": "new",
+  "mode": "gpt-5.6-luna max task-scoped worker",
+  "task_ids": ["TASK-0001"],
+  "sprint_id": null,
+  "run_id": "RUN-1970-01-01-template",
+  "anchors": [
+    { "id": "task", "path": ".agents/tasks/backlog/TASK-0001/task.json", "description": "Canonical task and dependency state.", "required": true },
+    { "id": "claim", "path": ".agents/work-claims/active/<claim>.json", "description": "Exclusive write fence for implementers; verifier packets use a receipt-only scope.", "required": true },
+    { "id": "return", "path": ".agents/runs/RUN-1970-01-01-template/returns/<unit>.json", "description": "Durable return and evidence location.", "required": true }
+  ],
+  "facts": [],
+  "decisions": [],
+  "constraints": [
+    { "id": "bounded", "text": "Perform only the packet action inside its write fence." },
+    { "id": "start-authority", "text": "Do not start from an eligibility receipt alone; require the configured provider's atomic compare-and-start decision." },
+    { "id": "authority", "text": "Implementers cannot qualify their own candidate; verifiers cannot amend implementation files." }
+  ],
+  "actions": [
+    { "id": "execute", "text": "Complete the bounded implementation or verification action.", "status": "pending" },
+    { "id": "evidence", "text": "Return exact commands, candidate SHA, artifacts, and observed verdict.", "status": "pending" }
+  ],
+  "verification": [
+    { "id": "write-fence", "check": "The diff stays inside the active claim." },
+    { "id": "evidence-bind", "check": "The return identifies the exact candidate SHA and evidence paths." }
+  ],
+  "open_questions": [],
+  "write_fence": ["claim://active-or-verification-receipt-only"],
+  "return_contract": {
+    "destination": ".agents/runs/RUN-1970-01-01-template/returns/<unit>.json",
+    "format": "json",
+    "required_fields": ["status", "candidate_sha", "commands", "evidence_refs", "verdict"],
+    "final_verdict": "observed result only; the Sol owner makes final claims"
+  },
+  "stop_conditions": [
+    "The write fence is missing, overlapping, or stale.",
+    "A dependency or required evidence source is unavailable.",
+    "The requested action would combine implementer and verifier authority."
+  ],
+  "created_at": "1970-01-01T00:00:00Z"
+}

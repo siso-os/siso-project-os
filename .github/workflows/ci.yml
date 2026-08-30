@@ -22,4 +22,5 @@ jobs:
       - run: npm test
       - run: npm run check
       - run: npm run smoke
+      - run: npm run smoke:packed-install
       - run: npm pack --dry-run

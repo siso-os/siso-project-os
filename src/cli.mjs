@@ -22,6 +22,14 @@ import { buildProject, projectSnapshot } from './build.mjs'
 import { discoverProjectCapabilities, doctorProjectCapabilities } from './capabilities.mjs'
 import { checkProject } from './check.mjs'
 import { formatOnboardingReport, onboardingReport } from './console.mjs'
+import {
+  admitFleet,
+  buildFleet,
+  checkFleetInstallation,
+  initFleet,
+  loadFleetBootstrap,
+  planFleetInstall,
+} from './fleet.mjs'
 import * as lifecycle from './lifecycle.mjs'
 import { closeRun, createRun, createSprint, createTask, updateTask } from './work.mjs'
 import { advanceUiCampaign, createUiCampaign, importUiReviewDecision } from './ui.mjs'
@@ -43,6 +51,9 @@ Usage:
   project-os capabilities list [path] [--json]
   project-os architecture assess|check [path] [--json]
   project-os architecture baseline [path] --by <agent> [--decision <ref>] [--ratchet]
+  project-os fleet plan|init [path] --config <fleet.bootstrap.json> [--dry-run]
+  project-os fleet check|build [path] [--json]
+  project-os fleet admit [path] --file <admission.json> [--dry-run]
   project-os scaffold skill --id <id> --description <text> [--title <title>]
   project-os scaffold agent --id <id> --description <text> [options]
   project-os scaffold command --id <id> --description <text> --program <program> [options]
@@ -217,6 +228,39 @@ export async function main(argv) {
     return
   }
   if (command === 'init') return initProject(argv.slice(1))
+
+  if (command === 'fleet') {
+    if (!['plan', 'init', 'check', 'build', 'admit'].includes(subcommand)) throw new Error(`unknown fleet command\n\n${HELP}`)
+    const { positional, flags } = parseArgs(rest)
+    const root = commandRoot(positional, flags)
+    await assertInitialized(root)
+    let result
+    if (subcommand === 'plan' || subcommand === 'init') {
+      const loaded = await loadFleetBootstrap(root, flags.config)
+      result = subcommand === 'plan'
+        ? await planFleetInstall(root, loaded.config, { configPath: loaded.path })
+        : await initFleet(root, loaded.config, { configPath: loaded.path, dryRun: flags['dry-run'] === true })
+      if (subcommand === 'init' && result.ok && flags['dry-run'] !== true) {
+        result.generated = Object.keys(await buildProject(root))
+      }
+      if (!result.ok) process.exitCode = 2
+    } else if (subcommand === 'check') {
+      result = await checkFleetInstallation(root)
+      if (!result.ok) process.exitCode = 1
+    } else if (subcommand === 'build') {
+      const outputs = await buildFleet(root)
+      result = { ok: true, outputs: Object.keys(outputs) }
+    } else {
+      const input = await recordFromFile(root, flags, 'fleet admit')
+      result = await admitFleet(root, input, { dryRun: flags['dry-run'] === true })
+      if (result.verdict !== 'admit') process.exitCode = 2
+    }
+    const printable = result && typeof result === 'object' && '_entries' in result
+      ? Object.fromEntries(Object.entries(result).filter(([key]) => key !== '_entries'))
+      : result
+    print(printable, flags.json === true)
+    return
+  }
 
   if (command === 'adopt') {
     if (!['plan', 'apply'].includes(subcommand)) throw new Error(`unknown adoption command\n\n${HELP}`)

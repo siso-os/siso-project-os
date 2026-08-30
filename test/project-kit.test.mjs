@@ -46,7 +46,7 @@ test('complete project adoption installs every pack and is idempotent', async (t
   assert.match(operatingMap, /Complete &amp; &quot;fixture&quot;/)
   const configuration = JSON.parse(await readFile(join(root, '.project-os', 'project.json'), 'utf8'))
   assert.equal(configuration.project_name, 'Complete & "fixture"')
-  assert.deepEqual(configuration.launcher, { program: 'npx', arguments: ['--yes', 'github:sisodias/siso-project-os#v0.4.0'] })
+  assert.deepEqual(configuration.launcher, { program: 'npx', arguments: ['--yes', 'github:sisodias/siso-project-os#v0.5.0'] })
   assert.match(await readFile(join(root, '.project-os', 'project.json'), 'utf8'), /cold agent can safely resume/i)
   const onboardCommand = JSON.parse(await readFile(join(root, '.agents', 'commands', 'project-os-onboard.json'), 'utf8'))
   assert.equal(onboardCommand.program, configuration.launcher.program)

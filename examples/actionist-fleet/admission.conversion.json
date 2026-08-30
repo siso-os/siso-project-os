@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "id": "ADMISSION-ACTIONIST-CONVERSION",
+  "evaluated_at": "2026-08-30T12:00:00Z",
+  "candidate": {
+    "task_id": "TASK-0003",
+    "actor": "LUNA-CONVERSION-01",
+    "role": "fleet-implementer",
+    "domain_id": "foundry",
+    "repository_id": "actionist-base",
+    "machine_id": "mac-mini",
+    "candidate_sha": "0000000000000000000000000000000000000001",
+    "write_paths": ["packages/foundry/first-donor"],
+    "evidence_path": ".agents/fleet/evidence/foundry/TASK-0003",
+    "mode": "new"
+  },
+  "observations": {
+    "live_assignments": [
+      {
+        "actor": "ACTIONIST-PM",
+        "task_id": "TASK-0002",
+        "role": "fleet-pm",
+        "domain_id": "programme",
+        "machine_id": "mac-mini",
+        "state": "working",
+        "heartbeat_at": "2026-08-30T11:55:00Z",
+        "recovery_disposition": "none"
+      }
+    ],
+    "pending_verifications": 2,
+    "machine": {
+      "id": "mac-mini",
+      "available_disk_bytes": 50000000000,
+      "available_memory_bytes": 8000000000,
+      "load_per_cpu": 0.25,
+      "on_ac_power": true
+    },
+    "evidence_refs": [".agents/fleet/evidence/foundry/TASK-0003/admission.json"]
+  }
+}

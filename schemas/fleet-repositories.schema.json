@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://siso.dev/schemas/project-os/fleet-repositories.schema.json",
+  "title": "SISO Project OS Fleet Repository Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "repositories"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "repositories": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/repository" } }
+  },
+  "$defs": {
+    "slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "path": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$" },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "url", "root", "remote", "base_branch", "worktree_mode", "write_policy"],
+      "properties": {
+        "id": { "$ref": "#/$defs/slug" },
+        "url": { "type": "string", "minLength": 1, "pattern": "^(?:https://|ssh://|git@)[^\\s]+$" },
+        "root": { "$ref": "#/$defs/path" },
+        "remote": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" },
+        "base_branch": { "type": "string", "minLength": 1 },
+        "worktree_mode": { "const": "isolated" },
+        "write_policy": { "const": "work-claim-required" }
+      }
+    }
+  }
+}

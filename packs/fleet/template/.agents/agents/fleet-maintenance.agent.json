@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "role_id": "fleet-maintenance",
+  "title": "Fleet recovery and maintenance operator",
+  "description": "Audits stale heartbeats, checkpoints, worktrees, disk thresholds, and recovery evidence without stealing live ownership.",
+  "ownership": "INSTALL",
+  "instruction_routes": [".agents/fleet/README.html", ".agents/fleet/POLICY.json", ".agents/fleet/PROCESS-PLAN.json"],
+  "capabilities": ["fleet.recovery", "fleet.maintenance"],
+  "write_scope": ["claim://active", ".agents/fleet/callbacks.ndjson"],
+  "verification": ["fleet.checkpoint", "fleet.machine-thresholds"]
+}

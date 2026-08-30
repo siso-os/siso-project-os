@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "policy": "Borrow contract patterns only; do not copy incompatible code or authority models.",
+  "primary_sources": [
+    { "id": "cursor-durable-cloud-agents", "url": "https://cursor.com/blog/cloud-agent-lessons", "pattern": "durable execution, retry streams, checkpoint and restore" },
+    { "id": "cursor-self-hosted-workers", "url": "https://cursor.com/blog/self-hosted-cloud-agents", "pattern": "dedicated workers, pools, autoscaling and placement" },
+    { "id": "temporal", "url": "https://docs.temporal.io/", "pattern": "durable execution semantics without adding a dependency" },
+    { "id": "anthropic-orchestrator-workers", "url": "https://www.anthropic.com/engineering/multi-agent-research-system", "pattern": "lead decomposition, focused workers and artifact synthesis" },
+    { "id": "openai-codex-worktrees", "url": "https://openai.com/index/introducing-the-codex-app/", "pattern": "parallel threads, isolated worktrees and diff review" },
+    { "id": "openai-harness-engineering", "url": "https://openai.com/index/harness-engineering/", "pattern": "bootable worktrees, legible evidence and agent review" },
+    { "id": "openai-codex-safety", "url": "https://openai.com/index/running-codex-safely/", "pattern": "sandbox, risk, network and telemetry boundaries" },
+    { "id": "github-mission-control", "url": "https://github.blog/ai-and-ml/github-copilot/how-to-orchestrate-agents-using-mission-control/", "pattern": "cross-repository read and steering surface" },
+    { "id": "xai-workflows", "url": "https://x.ai/news/workflows", "pattern": "phase fan-out, skeptical verification, progress and budgets" }
+  ],
+  "repository_sources": [
+    { "id": "firstmate", "url": "https://github.com/kunchenguid/firstmate", "revision": "1fbc7bb1fba262ef38a4dedf321d18c54669b129", "license": "MIT" },
+    { "id": "gnhf", "url": "https://github.com/kunchenguid/gnhf", "revision": "49982a9cbc56473177b99c98d0b6b880f47af6f3", "license": "MIT" },
+    { "id": "stoneforge", "url": "https://github.com/stoneforge-ai/stoneforge", "revision": "0a7052a9ffa1fb42fafbff9d9b6b83fa48cdad95", "license": "Apache-2.0" },
+    { "id": "sudocode", "url": "https://github.com/sudocode-ai/sudocode", "revision": "632de1910bc4e272f99db7a33dad8f22feb743d9", "license": "Apache-2.0" },
+    { "id": "overstory", "url": "https://github.com/jayminwest/overstory", "revision": "ff38f3f76f084abcc34f519bcaa69580f6e53cf1", "license": "MIT", "status": "archived-reference-only" },
+    { "id": "atc-kanban", "url": "https://github.com/JSCOP/atc-kanban", "revision": "c520694f73a71adaca527cab16c7eca83797b7fa", "license": "MIT" }
+  ],
+  "rejected_boundaries": ["automatic merge", "permission bypass", "second task database", "second scheduler", "mail bus", "daemon", "provider control plane"]
+}

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://siso.dev/schemas/project-os/fleet-source-contract.schema.json",
+  "title": "SISO Project OS Fleet Front Door Source Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "authority", "consumer", "canonical_sources", "projections", "write_rule"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "authority": { "const": "read-only-projection" },
+    "consumer": { "type": "string", "minLength": 1 },
+    "canonical_sources": { "const": [{ "name": "tasks", "kind": "canonical-records", "path": ".agents/tasks" }, { "name": "runs", "kind": "canonical-records", "path": ".agents/runs" }, { "name": "missions", "kind": "canonical-records", "path": ".agents/missions" }, { "name": "claims", "kind": "canonical-records", "path": ".agents/work-claims" }, { "name": "decisions", "kind": "append-only-ledger", "path": "docs/ledgers/decisions.jsonl" }, { "name": "callbacks", "kind": "append-only-ledger", "path": ".agents/fleet/callbacks.ndjson" }, { "name": "qualification", "kind": "evidence-receipts", "path": ".agents/runs" }] },
+    "projections": { "const": [".agents/fleet/generated/TASK-GRAPH.json", ".agents/fleet/generated/TEAM-STATE.json", ".agents/fleet/generated/FLEET.html"] },
+    "write_rule": { "const": "Consumers must never write task, ownership, completion, admission, or qualification state through a projection." }
+  },
+  "$defs": {
+    "path": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "kind", "path"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "kind": { "type": "string", "enum": ["canonical-records", "append-only-ledger", "evidence-receipts"] },
+        "path": { "$ref": "#/$defs/path" }
+      }
+    }
+  }
+}

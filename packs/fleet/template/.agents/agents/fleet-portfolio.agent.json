@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "role_id": "fleet-portfolio",
+  "title": "Fleet portfolio observer",
+  "description": "Reads canonical programme and projection state to surface cross-domain demand, verifier backlog, and blocked dependencies.",
+  "ownership": "INSTALL",
+  "instruction_routes": [".agents/fleet/README.html", ".agents/fleet/SOURCE-CONTRACT.json"],
+  "capabilities": ["fleet.portfolio", "fleet.projection"],
+  "write_scope": [],
+  "verification": ["fleet.source-contract"]
+}

@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "role_id": "fleet-domain-owner",
+  "title": "Persistent Sol domain owner",
+  "description": "Owns one exclusive domain, runs a durable goal, delegates bounded Luna packets, and makes final evidence-backed claims.",
+  "ownership": "INSTALL",
+  "instruction_routes": [".agents/fleet/README.html", ".agents/fleet/PROGRAM.json", ".agents/fleet/contracts/SOL-GOAL.template.json"],
+  "capabilities": ["fleet.domain", "fleet.delegation", "fleet.handoff"],
+  "write_scope": ["claim://active", ".agents/fleet/callbacks.ndjson"],
+  "verification": ["fleet.independent-verifier", "fleet.write-fence"]
+}

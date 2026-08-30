@@ -50,11 +50,18 @@ export function normalizeRepoPath(value) {
 
 export function normalizeWriteSet(value) {
   const normalized = valuesList(value).map(normalizeRepoPath)
-  return [...new Set(normalized)].sort()
+  const unique = new Map()
+  for (const path of normalized) {
+    const key = path.normalize('NFC').toLowerCase()
+    if (!unique.has(key)) unique.set(key, path)
+  }
+  return [...unique.values()].sort()
 }
 
 export function pathsIntersect(left, right) {
-  return left === right || left.startsWith(`${right}/`) || right.startsWith(`${left}/`)
+  const normalizedLeft = left.normalize('NFC').toLowerCase()
+  const normalizedRight = right.normalize('NFC').toLowerCase()
+  return normalizedLeft === normalizedRight || normalizedLeft.startsWith(`${normalizedRight}/`) || normalizedRight.startsWith(`${normalizedLeft}/`)
 }
 
 export function writeSetsIntersect(left, right) {
@@ -62,7 +69,11 @@ export function writeSetsIntersect(left, right) {
 }
 
 export function pathCoveredByFence(path, fence) {
-  return fence.some((allowed) => path === allowed || path.startsWith(`${allowed}/`))
+  const normalizedPath = path.normalize('NFC').toLowerCase()
+  return fence.some((allowed) => {
+    const normalizedAllowed = allowed.normalize('NFC').toLowerCase()
+    return normalizedPath === normalizedAllowed || normalizedPath.startsWith(`${normalizedAllowed}/`)
+  })
 }
 
 export function repositoryRelative(root, absolutePath) {

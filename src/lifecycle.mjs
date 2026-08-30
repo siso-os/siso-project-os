@@ -347,8 +347,8 @@ async function activeWorkClaims(root) {
 
 export async function acquireWorkClaim(root, flags = {}) {
   const taskId = requiredString(pick(flags, 'task_id') ?? flags.task, 'work claim task_id')
-  const runId = pick(flags, 'run_id') ?? null
-  const unitId = pick(flags, 'unit_id') ?? null
+  const runId = pick(flags, 'run_id') ?? flags.run ?? null
+  const unitId = pick(flags, 'unit_id') ?? flags.unit ?? null
   const actor = requiredString(flags.actor ?? flags.by, 'work claim actor')
   const attempt = Number(pick(flags, 'attempt') ?? 1)
   if (!Number.isInteger(attempt) || attempt < 1) throw new Error('work claim attempt must be a positive integer')

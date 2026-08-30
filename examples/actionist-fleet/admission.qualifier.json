@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "id": "ADMISSION-ACTIONIST-QUALIFIER",
+  "evaluated_at": "2026-08-30T12:00:00Z",
+  "candidate": {
+    "task_id": "TASK-0001",
+    "actor": "PROGRAM-VERIFIER-SOL",
+    "role": "fleet-verifier",
+    "domain_id": "qualification",
+    "repository_id": "actionist-programme",
+    "machine_id": "mac-mini",
+    "candidate_sha": "0000000000000000000000000000000000000001",
+    "implementation_actor": "ACTIONIST-PM",
+    "write_paths": [],
+    "evidence_path": ".agents/fleet/evidence/qualification/TASK-0001",
+    "mode": "new"
+  },
+  "observations": {
+    "live_assignments": [
+      {
+        "actor": "ACTIONIST-PM",
+        "task_id": "TASK-0002",
+        "role": "fleet-pm",
+        "domain_id": "programme",
+        "machine_id": "mac-mini",
+        "state": "working",
+        "heartbeat_at": "2026-08-30T11:55:00Z",
+        "recovery_disposition": "none"
+      }
+    ],
+    "pending_verifications": 2,
+    "machine": {
+      "id": "mac-mini",
+      "available_disk_bytes": 50000000000,
+      "available_memory_bytes": 8000000000,
+      "load_per_cpu": 0.25,
+      "on_ac_power": true
+    },
+    "evidence_refs": [".agents/fleet/evidence/qualification/TASK-0001/source-snapshot.json"]
+  }
+}

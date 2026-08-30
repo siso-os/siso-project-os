@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "pack_id": "siso-agent-fleet-runtime",
+  "pack_version": "1.0.0",
+  "project_os_minimum_version": "0.5.0",
+  "canonical_root": ".agents/fleet",
+  "source_repository": "https://github.com/sisodias/siso-project-os",
+  "install_command": "project-os fleet init <path> --config <fleet.bootstrap.json>",
+  "validation_command": "project-os fleet check <path> --json",
+  "ownership": {
+    "project_os": ["contracts", "schemas", "admission decisions", "deterministic projections"],
+    "providers": ["process control", "model routing", "messaging", "telemetry"],
+    "front_door": ["read-only projection consumption"]
+  }
+}

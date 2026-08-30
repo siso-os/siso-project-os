@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "pack_version": "1.0.0",
+  "programme": {
+    "id": "PROGRAM-actionist",
+    "name": "Actionist Block Foundry",
+    "summary": "A public-safe rehearsal of the Actionist programme fleet contract.",
+    "desired_outcome": "Admit bounded engineering work only when dependency, ownership, evidence, verifier, worktree, and machine gates pass.",
+    "owner": "ACTIONIST-PM",
+    "evidence_root": ".agents/fleet/evidence",
+    "callback_ledger": ".agents/fleet/callbacks.ndjson"
+  },
+  "repositories": [
+    {
+      "id": "actionist-programme",
+      "url": "https://github.com/example/actionist-programme.git",
+      "root": ".",
+      "remote": "origin",
+      "base_branch": "main",
+      "worktree_mode": "isolated",
+      "write_policy": "work-claim-required"
+    },
+    {
+      "id": "actionist-base",
+      "url": "https://github.com/example/actionist-base.git",
+      "root": "actionist-base",
+      "remote": "origin",
+      "base_branch": "main",
+      "worktree_mode": "isolated",
+      "write_policy": "work-claim-required"
+    }
+  ],
+  "domains": [
+    {
+      "id": "programme",
+      "title": "Programme governance",
+      "owner": "ACTIONIST-PM",
+      "owner_role": "fleet-pm",
+      "verifier_role": "fleet-verifier",
+      "repository_id": "actionist-programme",
+      "write_paths": ["runs/programme", "docs/programme"],
+      "evidence_paths": [".agents/fleet/evidence/programme"]
+    },
+    {
+      "id": "portfolio",
+      "title": "Portfolio evidence",
+      "owner": "ACTIONIST-PORTFOLIO-OWNER",
+      "owner_role": "fleet-domain-owner",
+      "verifier_role": "fleet-verifier",
+      "repository_id": "actionist-programme",
+      "write_paths": ["research/portfolio"],
+      "evidence_paths": [".agents/fleet/evidence/portfolio"]
+    },
+    {
+      "id": "foundry",
+      "title": "Repo-to-block foundry",
+      "owner": "ACTIONIST-FOUNDRY-OWNER",
+      "owner_role": "fleet-domain-owner",
+      "verifier_role": "fleet-verifier",
+      "repository_id": "actionist-base",
+      "write_paths": ["packages/foundry", "test/foundry"],
+      "evidence_paths": [".agents/fleet/evidence/foundry"]
+    },
+    {
+      "id": "affine-release",
+      "title": "AFFiNE release",
+      "owner": "ACTIONIST-RELEASE-OWNER",
+      "owner_role": "fleet-domain-owner",
+      "verifier_role": "fleet-verifier",
+      "repository_id": "actionist-base",
+      "write_paths": ["packages/affine-adapter", "test/affine"],
+      "evidence_paths": [".agents/fleet/evidence/affine-release"]
+    },
+    {
+      "id": "front-door",
+      "title": "Mission Control projection",
+      "owner": "ACTIONIST-FRONT-DOOR",
+      "owner_role": "fleet-front-door",
+      "verifier_role": "fleet-verifier",
+      "repository_id": "actionist-programme",
+      "write_paths": ["site/mission-control"],
+      "evidence_paths": [".agents/fleet/evidence/front-door"]
+    },
+    {
+      "id": "qualification",
+      "title": "Independent programme qualification",
+      "owner": "ACTIONIST-PM",
+      "owner_role": "fleet-pm",
+      "verifier_role": "fleet-verifier",
+      "repository_id": "actionist-programme",
+      "write_paths": ["evidence/qualification"],
+      "evidence_paths": [".agents/fleet/evidence/qualification"]
+    }
+  ],
+  "policy": {
+    "capacity": {
+      "max_live": 8,
+      "verifier_ratio": 0.25,
+      "verifier_reserve": 2,
+      "max_pending_verifications": 2
+    },
+    "heartbeat": {
+      "stale_after_seconds": 1800,
+      "recovery_requires_checkpoint": true
+    },
+    "admission": {
+      "require_clean_worktree": true,
+      "require_evidence_path": true,
+      "require_repository_boundary": true
+    },
+    "qualification": {
+      "independent_verifier": true,
+      "require_candidate_sha": true,
+      "require_evidence_refs": true
+    }
+  },
+  "machines": [
+    {
+      "id": "mac-mini",
+      "host_class": "mac-mini",
+      "roles": ["lead", "worker", "verifier", "maintenance", "fleet-domain-owner", "fleet-verifier"],
+      "max_live": 6,
+      "preference": 1,
+      "thresholds": {
+        "minimum_available_disk_bytes": 5000000000,
+        "minimum_available_memory_bytes": 1073741824,
+        "maximum_load_per_cpu": 2,
+        "require_ac_power": true
+      }
+    },
+    {
+      "id": "macbook",
+      "host_class": "macbook",
+      "roles": ["lead", "portfolio", "front-door", "fleet-pm", "fleet-front-door"],
+      "max_live": 2,
+      "preference": 2,
+      "thresholds": {
+        "minimum_available_disk_bytes": 5000000000,
+        "minimum_available_memory_bytes": 1073741824,
+        "maximum_load_per_cpu": 2,
+        "require_ac_power": true
+      }
+    }
+  ],
+  "bootstrap_machine_id": "mac-mini",
+  "process_controller": {
+    "provider": "herdr",
+    "workspace": "ACTIONIST-FIXTURE",
+    "durable_identity_field": "terminal_id",
+    "volatile_identity_fields": ["pane_id", "process_id"],
+    "lead_profile": "gpt-5.6-sol",
+    "worker_profile": "gpt-5.6-luna",
+    "worker_reasoning_effort": "max",
+    "callback_transport": "herdr-message-plus-project-callback-ledger"
+  },
+  "front_door": {
+    "consumer": "Actionist Mission Control",
+    "projection_root": ".agents/fleet/generated",
+    "source_contract": ".agents/fleet/SOURCE-CONTRACT.json"
+  }
+}

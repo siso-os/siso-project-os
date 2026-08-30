@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://siso.dev/schemas/project-os/fleet-pack.schema.json",
+  "title": "SISO Project OS Fleet Pack Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "pack_id", "pack_version", "project_os_minimum_version", "canonical_root", "source_repository", "contracts", "reused_contracts", "installed_files", "managed_artifacts", "generated_files"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "pack_id": { "const": "siso-agent-fleet-runtime" },
+    "pack_version": { "const": "1.0.0" },
+    "project_os_minimum_version": { "const": "0.5.0" },
+    "canonical_root": { "const": ".agents/fleet" },
+    "source_repository": { "const": "https://github.com/sisodias/siso-project-os" },
+    "contracts": { "const": { "programme": ".agents/fleet/PROGRAM.json", "domains": ".agents/fleet/domains", "repositories": ".agents/fleet/REPOS.json", "policy": ".agents/fleet/POLICY.json", "process_plan": ".agents/fleet/PROCESS-PLAN.json", "callbacks": ".agents/fleet/callbacks.ndjson", "source_contract": ".agents/fleet/SOURCE-CONTRACT.json", "sol_goal": ".agents/fleet/contracts/SOL-GOAL.template.json", "luna_task": ".agents/fleet/contracts/LUNA-TASK.template.json" } },
+    "reused_contracts": { "const": [".agents/tasks", ".agents/runs", ".agents/missions", ".agents/work-claims", ".agents/delivery", "docs/ledgers/decisions.jsonl"] },
+    "installed_files": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/path" } },
+    "managed_artifacts": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/managedArtifact" } },
+    "generated_files": { "const": [".agents/fleet/generated/TASK-GRAPH.json", ".agents/fleet/generated/TEAM-STATE.json", ".agents/fleet/generated/FLEET.html"] }
+  },
+  "$defs": {
+    "path": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$" },
+    "managedArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "$ref": "#/$defs/path" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    }
+  }
+}

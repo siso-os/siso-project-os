@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://siso.dev/schemas/project-os/fleet-program.schema.json",
+  "title": "SISO Project OS Fleet Programme",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "name", "summary", "desired_outcome", "owner", "evidence_root", "callback_ledger", "canonical_sources"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "id": { "type": "string", "pattern": "^PROGRAM-[a-z0-9][a-z0-9-]*$" },
+    "name": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "summary": { "type": "string", "minLength": 1 },
+    "desired_outcome": { "type": "string", "minLength": 1 },
+    "owner": { "type": "string", "minLength": 1 },
+    "evidence_root": { "const": ".agents/fleet/evidence" },
+    "callback_ledger": { "const": ".agents/fleet/callbacks.ndjson" },
+    "canonical_sources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tasks", "runs", "missions", "claims", "decisions", "qualification"],
+      "properties": {
+        "tasks": { "const": ".agents/tasks" },
+        "runs": { "const": ".agents/runs" },
+        "missions": { "const": ".agents/missions" },
+        "claims": { "const": ".agents/work-claims" },
+        "decisions": { "const": "docs/ledgers/decisions.jsonl" },
+        "qualification": { "const": ".agents/runs" }
+      }
+    }
+  },
+  "$defs": {
+    "path": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$" }
+  }
+}

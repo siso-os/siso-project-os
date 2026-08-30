@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://siso.dev/schemas/project-os/fleet-admission-input.schema.json",
+  "title": "SISO Project OS Fleet Admission Input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "evaluated_at", "candidate", "observations"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "id": { "type": "string", "pattern": "^ADMISSION-[A-Za-z0-9][A-Za-z0-9._-]*$" },
+    "evaluated_at": { "type": "string", "format": "date-time" },
+    "candidate": { "$ref": "#/$defs/candidate" },
+    "observations": { "$ref": "#/$defs/observations" }
+  },
+  "$defs": {
+    "slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "path": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$" },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_id", "actor", "role", "domain_id", "repository_id", "machine_id", "candidate_sha", "write_paths", "evidence_path", "mode"],
+      "properties": {
+        "task_id": { "type": "string", "pattern": "^TASK-[0-9]{4}$" },
+        "actor": { "type": "string", "minLength": 1 },
+        "role": { "$ref": "#/$defs/slug" },
+        "domain_id": { "$ref": "#/$defs/slug" },
+        "repository_id": { "$ref": "#/$defs/slug" },
+        "machine_id": { "$ref": "#/$defs/slug" },
+        "candidate_sha": { "type": "string", "pattern": "^[a-f0-9]{40,64}$" },
+        "claim_id": { "type": "string", "pattern": "^CLAIM-[A-Za-z0-9][A-Za-z0-9._-]*$" },
+        "implementation_actor": { "type": "string", "minLength": 1 },
+        "write_paths": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/path" } },
+        "evidence_path": { "$ref": "#/$defs/path" },
+        "mode": { "type": "string", "enum": ["new", "resume"] },
+        "resume_checkpoint": { "$ref": "#/$defs/path" }
+      }
+    },
+    "observations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["live_assignments", "pending_verifications", "machine", "evidence_refs"],
+      "properties": {
+        "live_assignments": { "type": "array", "items": { "$ref": "#/$defs/assignment" } },
+        "pending_verifications": { "type": "integer", "minimum": 0 },
+        "machine": { "$ref": "#/$defs/machineObservation" },
+        "evidence_refs": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/path" } }
+      }
+    },
+    "assignment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actor", "task_id", "role", "domain_id", "machine_id", "state", "heartbeat_at", "recovery_disposition"],
+      "properties": {
+        "actor": { "type": "string", "minLength": 1 },
+        "task_id": { "type": "string", "pattern": "^TASK-[0-9]{4}$" },
+        "role": { "$ref": "#/$defs/slug" },
+        "domain_id": { "$ref": "#/$defs/slug" },
+        "machine_id": { "$ref": "#/$defs/slug" },
+        "state": { "type": "string", "enum": ["starting", "working", "verifying", "blocked"] },
+        "heartbeat_at": { "type": "string", "format": "date-time" },
+        "recovery_disposition": { "type": "string", "enum": ["none", "checkpointed", "abandoned"] },
+        "checkpoint_ref": { "$ref": "#/$defs/path" }
+      }
+    },
+    "machineObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "available_disk_bytes", "available_memory_bytes", "load_per_cpu", "on_ac_power"],
+      "properties": {
+        "id": { "$ref": "#/$defs/slug" },
+        "available_disk_bytes": { "type": "integer", "minimum": 0 },
+        "available_memory_bytes": { "type": "integer", "minimum": 0 },
+        "load_per_cpu": { "type": "number", "minimum": 0 },
+        "on_ac_power": { "type": ["boolean", "null"] }
+      }
+    }
+  }
+}

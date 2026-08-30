@@ -1,6 +1,6 @@
 {
   "name": "@siso/project-os",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Agent-first per-project operating system: tasks, docs spine, UI campaigns, and anti-drift checks",
   "type": "module",
   "bin": {
@@ -13,6 +13,8 @@
     "scripts/",
     "schemas/",
     "migrations/",
+    "packs/",
+    "examples/",
     "template/",
     "docs/",
     "README.html",
@@ -22,7 +24,9 @@
   "scripts": {
     "test": "node --test",
     "check": "node scripts/self-check.mjs",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "smoke:packed-install": "node scripts/smoke-packed-install.mjs",
+    "dogfood:fleet": "node scripts/dogfood-actionist.mjs"
   },
   "engines": {
     "node": ">=20"

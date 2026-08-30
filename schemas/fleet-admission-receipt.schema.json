@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://siso.dev/schemas/project-os/fleet-admission-receipt.schema.json",
+  "title": "SISO Project OS Fleet Admission Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "evaluated_at", "candidate", "observations", "start_contract", "verdict", "reason_codes", "checks", "integrity"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "id": { "type": "string", "pattern": "^ADMISSION-[A-Za-z0-9][A-Za-z0-9._-]*$" },
+    "evaluated_at": { "type": "string", "format": "date-time" },
+    "candidate": { "type": "object" },
+    "observations": { "type": "object" },
+    "start_contract": { "$ref": "#/$defs/startContract" },
+    "verdict": { "type": "string", "enum": ["admit", "hold", "reject"] },
+    "reason_codes": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" } },
+    "checks": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/check" } },
+    "integrity": { "$ref": "#/$defs/integrity" }
+  },
+  "$defs": {
+    "startContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["admission_authority", "start_authority", "provider", "required_revalidation", "reusable"],
+      "properties": {
+        "admission_authority": { "const": "eligibility-only" },
+        "start_authority": { "const": "provider-atomic-compare-and-start" },
+        "provider": { "type": "string", "minLength": 1 },
+        "required_revalidation": { "const": ["active-work-claims", "provider-live-assignments", "verifier-backlog", "machine-thresholds"] },
+        "reusable": { "const": false }
+      }
+    },
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "status", "detail"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+        "status": { "type": "string", "enum": ["pass", "hold", "reject"] },
+        "detail": { "type": "string", "minLength": 1 }
+      }
+    },
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "scope", "digest"],
+      "properties": {
+        "algorithm": { "const": "sha256" },
+        "scope": { "const": "canonical-json-without-integrity" },
+        "digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    }
+  }
+}

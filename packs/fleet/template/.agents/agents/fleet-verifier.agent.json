@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "role_id": "fleet-verifier",
+  "title": "Independent Luna verifier",
+  "description": "Tests an exact candidate SHA independently and writes evidence receipts without changing implementation files.",
+  "ownership": "INSTALL",
+  "instruction_routes": [".agents/fleet/README.html", ".agents/fleet/POLICY.json", ".agents/fleet/contracts/LUNA-TASK.template.json"],
+  "capabilities": ["fleet.verification", "fleet.qualification"],
+  "write_scope": [".agents/runs/*/attempts/*/verification.receipt.json", ".agents/fleet/evidence"],
+  "verification": ["fleet.candidate-sha", "fleet.evidence"]
+}

@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "role_id": "fleet-implementer",
+  "title": "Task-scoped Luna implementer",
+  "description": "Implements one bounded task at maximum reasoning effort in an isolated worktree and returns exact evidence.",
+  "ownership": "INSTALL",
+  "instruction_routes": [".agents/fleet/README.html", ".agents/fleet/contracts/LUNA-TASK.template.json"],
+  "capabilities": ["fleet.implementation", "fleet.checkpoint"],
+  "write_scope": ["claim://active"],
+  "verification": ["fleet.write-fence", "fleet.candidate-sha"]
+}

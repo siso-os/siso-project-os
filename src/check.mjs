@@ -5,6 +5,7 @@ import { join } from 'node:path'
 import { checkArchitecture } from './architecture.mjs'
 import { UI_STAGES, listDirectories, pathExists, resolveProjectPointer, taskFolderForStatus, walkFiles } from './shared.mjs'
 import { expectedBuild } from './build.mjs'
+import { checkFleetInstallation } from './fleet.mjs'
 import { inspectRunCloseCensus } from './lifecycle.mjs'
 import { capabilityCoverageProblems, readCapabilityCoverage } from './provenance.mjs'
 import { validateSchema } from './schema.mjs'
@@ -226,6 +227,14 @@ export async function checkProject(root) {
     for (const entry of architecture.warnings) add(warnings, entry.code, formatStructuredProblem(entry), entry.path)
   } catch (error) {
     add(errors, 'architecture_check_failed', error.message, '.project-os/architecture')
+  }
+
+  try {
+    const fleet = await checkFleetInstallation(root, schemas)
+    errors.push(...fleet.errors)
+    warnings.push(...fleet.warnings)
+  } catch (error) {
+    add(errors, 'fleet_check_failed', error.message, '.agents/fleet')
   }
 
   try {

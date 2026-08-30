@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://siso.dev/schemas/project-os/fleet-team-state.schema.json",
+  "title": "SISO Project OS Fleet Team State Projection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "kind", "programme_id", "capacity", "domains", "active_missions", "active_claims", "runs", "callbacks", "admissions", "generation"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "kind": { "const": "fleet-team-state-projection" },
+    "programme_id": { "type": "string", "pattern": "^PROGRAM-[a-z0-9][a-z0-9-]*$" },
+    "capacity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_live", "verifier_ratio", "verifier_reserve", "max_non_verifiers", "active_claims", "remaining_claim_slots"],
+      "properties": {
+        "max_live": { "type": "integer", "minimum": 2 },
+        "verifier_ratio": { "type": "number", "minimum": 0.01, "maximum": 1 },
+        "verifier_reserve": { "type": "integer", "minimum": 1 },
+        "max_non_verifiers": { "type": "integer", "minimum": 0 },
+        "active_claims": { "type": "integer", "minimum": 0 },
+        "remaining_claim_slots": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "domains": { "type": "array", "items": { "$ref": "#/$defs/domain" } },
+    "active_missions": { "type": "array", "items": { "$ref": "#/$defs/mission" } },
+    "active_claims": { "type": "array", "items": { "$ref": "#/$defs/claim" } },
+    "runs": { "type": "array", "items": { "$ref": "#/$defs/run" } },
+    "callbacks": { "type": "object", "required": ["total", "unacknowledged"], "additionalProperties": false, "properties": { "total": { "type": "integer", "minimum": 0 }, "unacknowledged": { "type": "integer", "minimum": 0 } } },
+    "admissions": { "type": "object", "required": ["total", "admit", "hold", "reject"], "additionalProperties": false, "properties": { "total": { "type": "integer", "minimum": 0 }, "admit": { "type": "integer", "minimum": 0 }, "hold": { "type": "integer", "minimum": 0 }, "reject": { "type": "integer", "minimum": 0 } } },
+    "generation": { "$ref": "#/$defs/generation" }
+  },
+  "$defs": {
+    "domain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "owner", "owner_role", "verifier_role", "repository_id", "write_paths"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "owner": { "type": "string", "minLength": 1 },
+        "owner_role": { "type": "string", "minLength": 1 },
+        "verifier_role": { "type": "string", "minLength": 1 },
+        "repository_id": { "type": "string", "minLength": 1 },
+        "write_paths": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "mission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "owner", "heartbeat_at", "task_ids", "run_id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "owner": { "type": ["string", "null"] },
+        "heartbeat_at": { "type": ["string", "null"] },
+        "task_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "run_id": { "type": ["string", "null"] }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "task_id", "run_id", "actor", "seat", "write_set", "acquired_at"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "task_id": { "type": "string", "minLength": 1 },
+        "run_id": { "type": "string", "minLength": 1 },
+        "actor": { "type": "string", "minLength": 1 },
+        "seat": { "type": ["string", "null"] },
+        "write_set": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "acquired_at": { "type": "string", "minLength": 1 }
+      }
+    },
+    "run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "status", "task_ids", "units", "receipts", "gates"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "status": { "type": ["string", "null"] },
+        "task_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "units": { "type": "integer", "minimum": 0 },
+        "receipts": { "type": "integer", "minimum": 0 },
+        "gates": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "generation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["generator", "input_digest", "output_digest"],
+      "properties": {
+        "generator": { "type": "string", "minLength": 1 },
+        "input_digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "output_digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    }
+  }
+}

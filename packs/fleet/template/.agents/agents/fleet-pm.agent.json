@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "role_id": "fleet-pm",
+  "title": "Fleet programme manager",
+  "description": "Owns programme intent, dependency ordering, callbacks, and admission demand without acting as merge or process authority.",
+  "ownership": "INSTALL",
+  "instruction_routes": [".agents/fleet/README.html", ".agents/fleet/PROGRAM.json", ".agents/fleet/POLICY.json"],
+  "capabilities": ["fleet.programme", "fleet.admission", "fleet.callbacks"],
+  "write_scope": ["claim://active", ".agents/fleet/callbacks.ndjson"],
+  "verification": ["fleet.contracts", "fleet.evidence"]
+}

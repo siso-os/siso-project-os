@@ -10,6 +10,7 @@ import { discoverProjectCapabilities } from './capabilities.mjs'
 import { composeKnowledgeOnboarding, renderKnowledgeOnboardingHtml } from './knowledge-onboarding.mjs'
 import { readCapabilityCoverage, renderCapabilityCoverageHtml } from './provenance.mjs'
 import { expectedUiCampaignProjections } from './ui-projections.mjs'
+import { expectedFleetBuild } from './fleet.mjs'
 import { PROJECT_OS_VERSION } from './version.mjs'
 
 function htmlEscape(value) {
@@ -239,6 +240,7 @@ export async function expectedBuild(root) {
       Object.assign(outputs, await expectedUiCampaignProjections(root, campaign.id))
     }
   }
+  Object.assign(outputs, await expectedFleetBuild(root))
   return outputs
 }
 

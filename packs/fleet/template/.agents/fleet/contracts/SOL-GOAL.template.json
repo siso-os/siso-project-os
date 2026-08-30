@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "id": "PACKET-template-sol-goal",
+  "to": "fleet-domain-owner",
+  "from": "fleet-pm",
+  "thread": "Replace with the durable programme thread.",
+  "objective": "Replace with one durable, verifiable domain outcome.",
+  "state": "new",
+  "mode": "gpt-5.6-sol /goal persistent domain owner",
+  "task_ids": ["TASK-0001"],
+  "sprint_id": null,
+  "run_id": "RUN-1970-01-01-template",
+  "anchors": [
+    { "id": "programme", "path": ".agents/fleet/PROGRAM.json", "description": "Programme intent and canonical sources.", "required": true },
+    { "id": "domain", "path": ".agents/fleet/domains/<domain>.json", "description": "Exclusive domain ownership and evidence boundary.", "required": true },
+    { "id": "policy", "path": ".agents/fleet/POLICY.json", "description": "Admission, capacity, recovery, and qualification policy.", "required": true }
+  ],
+  "facts": [],
+  "decisions": [],
+  "constraints": [
+    { "id": "provider-boundary", "text": "Do not replace provider process control, routing, messaging, or telemetry." },
+    { "id": "provider-start", "text": "Fleet admission is eligibility-only; the provider must atomically revalidate capacity and claims while reserving the process slot." },
+    { "id": "goal-status", "text": "Goal UI state is not task completion or qualification." }
+  ],
+  "actions": [
+    { "id": "admit", "text": "For writes, acquire an exact active work claim; record eligibility; then require provider-atomic compare-and-start.", "status": "pending" },
+    { "id": "delegate", "text": "Delegate bounded task packets to Luna workers within exclusive write fences.", "status": "pending" },
+    { "id": "verify", "text": "Route candidate commits and evidence to an independent verifier.", "status": "pending" },
+    { "id": "checkpoint", "text": "Checkpoint durable state and append callbacks at each material boundary.", "status": "pending" }
+  ],
+  "verification": [
+    { "id": "pack-check", "check": "Fleet and Project OS contracts pass.", "command": "project-os check --json" },
+    { "id": "candidate-proof", "check": "Independent receipt binds evidence to the candidate SHA." }
+  ],
+  "open_questions": [],
+  "write_fence": ["claim://active"],
+  "return_contract": {
+    "destination": ".agents/fleet/callbacks.ndjson",
+    "format": "jsonl",
+    "required_fields": ["status", "task_ids", "evidence_refs", "candidate_sha", "verdict"],
+    "final_verdict": "PASS or FAIL; never infer completion from goal status"
+  },
+  "stop_conditions": [
+    "Ownership overlaps another active domain or work claim.",
+    "Verifier capacity or an evidence path is unavailable.",
+    "Machine thresholds fail or the worktree is dirty.",
+    "A restart lacks a durable checkpoint."
+  ],
+  "created_at": "1970-01-01T00:00:00Z"
+}

@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://siso.dev/schemas/project-os/fleet-bootstrap.schema.json",
+  "title": "SISO Project OS Fleet Bootstrap",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "pack_version", "programme", "repositories", "domains", "policy", "machines", "bootstrap_machine_id", "process_controller", "front_door"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "pack_version": { "const": "1.0.0" },
+    "programme": { "$ref": "#/$defs/programme" },
+    "repositories": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/repository" } },
+    "domains": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/domain" } },
+    "policy": { "$ref": "#/$defs/policy" },
+    "machines": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/machine" } },
+    "bootstrap_machine_id": { "$ref": "#/$defs/slug" },
+    "process_controller": { "$ref": "#/$defs/processController" },
+    "front_door": { "$ref": "#/$defs/frontDoor" }
+  },
+  "$defs": {
+    "slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "relativePath": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$" },
+    "programme": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "summary", "desired_outcome", "owner", "evidence_root", "callback_ledger"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^PROGRAM-[a-z0-9][a-z0-9-]*$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "summary": { "type": "string", "minLength": 1 },
+        "desired_outcome": { "type": "string", "minLength": 1 },
+        "owner": { "type": "string", "minLength": 1 },
+        "evidence_root": { "const": ".agents/fleet/evidence" },
+        "callback_ledger": { "const": ".agents/fleet/callbacks.ndjson" }
+      }
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "url", "root", "remote", "base_branch", "worktree_mode", "write_policy"],
+      "properties": {
+        "id": { "$ref": "#/$defs/slug" },
+        "url": { "type": "string", "minLength": 1, "pattern": "^(?:https://|ssh://|git@)[^\\s]+$" },
+        "root": { "$ref": "#/$defs/relativePath" },
+        "remote": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" },
+        "base_branch": { "type": "string", "minLength": 1 },
+        "worktree_mode": { "const": "isolated" },
+        "write_policy": { "const": "work-claim-required" }
+      }
+    },
+    "domain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "owner", "owner_role", "verifier_role", "repository_id", "write_paths", "evidence_paths"],
+      "properties": {
+        "id": { "$ref": "#/$defs/slug" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "owner": { "type": "string", "minLength": 1 },
+        "owner_role": { "type": "string", "enum": ["fleet-pm", "fleet-domain-owner", "fleet-portfolio", "fleet-front-door", "fleet-maintenance"] },
+        "verifier_role": { "const": "fleet-verifier" },
+        "repository_id": { "$ref": "#/$defs/slug" },
+        "write_paths": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/relativePath" } },
+        "evidence_paths": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/relativePath" } }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capacity", "heartbeat", "admission", "qualification"],
+      "properties": {
+        "capacity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["max_live", "verifier_ratio", "verifier_reserve", "max_pending_verifications"],
+          "properties": {
+            "max_live": { "type": "integer", "minimum": 2 },
+            "verifier_ratio": { "type": "number", "minimum": 0.01, "maximum": 1 },
+            "verifier_reserve": { "type": "integer", "minimum": 1 },
+            "max_pending_verifications": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "heartbeat": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["stale_after_seconds", "recovery_requires_checkpoint"],
+          "properties": {
+            "stale_after_seconds": { "type": "integer", "minimum": 30 },
+            "recovery_requires_checkpoint": { "const": true }
+          }
+        },
+        "admission": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["require_clean_worktree", "require_evidence_path", "require_repository_boundary"],
+          "properties": {
+            "require_clean_worktree": { "const": true },
+            "require_evidence_path": { "const": true },
+            "require_repository_boundary": { "const": true }
+          }
+        },
+        "qualification": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["independent_verifier", "require_candidate_sha", "require_evidence_refs"],
+          "properties": {
+            "independent_verifier": { "const": true },
+            "require_candidate_sha": { "const": true },
+            "require_evidence_refs": { "const": true }
+          }
+        }
+      }
+    },
+    "machine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "host_class", "roles", "max_live", "thresholds"],
+      "properties": {
+        "id": { "$ref": "#/$defs/slug" },
+        "host_class": { "type": "string", "enum": ["macbook", "mac-mini", "linux", "cloud", "other"] },
+        "roles": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/slug" } },
+        "max_live": { "type": "integer", "minimum": 1 },
+        "preference": { "type": "integer", "minimum": 1 },
+        "thresholds": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["minimum_available_disk_bytes", "minimum_available_memory_bytes", "maximum_load_per_cpu", "require_ac_power"],
+          "properties": {
+            "minimum_available_disk_bytes": { "type": "integer", "minimum": 1 },
+            "minimum_available_memory_bytes": { "type": "integer", "minimum": 1 },
+            "maximum_load_per_cpu": { "type": "number", "minimum": 0.01 },
+            "require_ac_power": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "processController": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "workspace", "durable_identity_field", "volatile_identity_fields", "lead_profile", "worker_profile", "worker_reasoning_effort", "callback_transport"],
+      "properties": {
+        "provider": { "type": "string", "minLength": 1 },
+        "workspace": { "type": "string", "minLength": 1 },
+        "durable_identity_field": { "const": "terminal_id" },
+        "volatile_identity_fields": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+        "lead_profile": { "type": "string", "minLength": 1 },
+        "worker_profile": { "type": "string", "minLength": 1 },
+        "worker_reasoning_effort": { "const": "max" },
+        "callback_transport": { "type": "string", "minLength": 1 }
+      }
+    },
+    "frontDoor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["consumer", "projection_root", "source_contract"],
+      "properties": {
+        "consumer": { "type": "string", "minLength": 1 },
+        "projection_root": { "const": ".agents/fleet/generated" },
+        "source_contract": { "const": ".agents/fleet/SOURCE-CONTRACT.json" }
+      }
+    }
+  }
+}

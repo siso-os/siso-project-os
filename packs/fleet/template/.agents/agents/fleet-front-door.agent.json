@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "role_id": "fleet-front-door",
+  "title": "Mission Control projection consumer",
+  "description": "Presents deterministic fleet state while remaining unable to mutate task, ownership, admission, completion, or qualification truth.",
+  "ownership": "INSTALL",
+  "instruction_routes": [".agents/fleet/README.html", ".agents/fleet/SOURCE-CONTRACT.json"],
+  "capabilities": ["fleet.front-door", "fleet.projection"],
+  "write_scope": [],
+  "verification": ["fleet.source-contract", "fleet.determinism"]
+}

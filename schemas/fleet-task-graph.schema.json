@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://siso.dev/schemas/project-os/fleet-task-graph.schema.json",
+  "title": "SISO Project OS Fleet Task Graph Projection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "kind", "programme_id", "nodes", "edges", "counts", "generation"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "kind": { "const": "fleet-task-graph-projection" },
+    "programme_id": { "type": "string", "pattern": "^PROGRAM-[a-z0-9][a-z0-9-]*$" },
+    "nodes": { "type": "array", "items": { "$ref": "#/$defs/node" } },
+    "edges": { "type": "array", "items": { "$ref": "#/$defs/edge" } },
+    "counts": { "$ref": "#/$defs/counts" },
+    "generation": { "$ref": "#/$defs/generation" }
+  },
+  "$defs": {
+    "taskId": { "type": "string", "pattern": "^TASK-[0-9]{4}$" },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "status", "priority", "domain", "owner", "dependencies", "blocked_by", "ready", "requires_human"],
+      "properties": {
+        "id": { "$ref": "#/$defs/taskId" },
+        "title": { "type": ["string", "null"] },
+        "status": { "type": ["string", "null"] },
+        "priority": { "type": ["string", "null"] },
+        "domain": { "type": ["string", "null"] },
+        "owner": { "type": ["string", "null"] },
+        "dependencies": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/taskId" } },
+        "blocked_by": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/taskId" } },
+        "ready": { "type": "boolean" },
+        "requires_human": { "type": "boolean" }
+      }
+    },
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "kind"],
+      "properties": {
+        "from": { "$ref": "#/$defs/taskId" },
+        "to": { "$ref": "#/$defs/taskId" },
+        "kind": { "const": "blocks" }
+      }
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["total", "ready", "blocked", "completed"],
+      "properties": {
+        "total": { "type": "integer", "minimum": 0 },
+        "ready": { "type": "integer", "minimum": 0 },
+        "blocked": { "type": "integer", "minimum": 0 },
+        "completed": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "generation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["generator", "input_digest", "output_digest"],
+      "properties": {
+        "generator": { "type": "string", "minLength": 1 },
+        "input_digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "output_digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    }
+  }
+}
