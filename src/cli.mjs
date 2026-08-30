@@ -33,16 +33,23 @@ import {
 import * as lifecycle from './lifecycle.mjs'
 import { closeRun, createRun, createSprint, createTask, updateTask } from './work.mjs'
 import { advanceUiCampaign, createUiCampaign, importUiReviewDecision } from './ui.mjs'
-import { applyUpgrade, planUpgrade, rollbackUpgrade, writeInstallManifest } from './upgrade.mjs'
+import {
+  applyUpgrade,
+  planUpgrade,
+  rollbackUpgrade,
+  runtimeTemplateReplacements,
+  verifyRuntimeSource,
+  writeInstallManifest,
+} from './upgrade.mjs'
 
 const HELP = `SISO Project OS
 
 Usage:
-  project-os init [path] [--name <name>] [--summary <text>] [--outcome <text>] [--dry-run]
-  project-os adopt plan [path]
-  project-os adopt apply [path] [--dry-run]
-  project-os upgrade plan [path]
-  project-os upgrade apply [path] [--dry-run] [--by <agent>]
+  project-os init [path] [--name <name>] [--summary <text>] [--outcome <text>] [runtime provenance] [--dry-run]
+  project-os adopt plan [path] [runtime provenance]
+  project-os adopt apply [path] [runtime provenance] [--dry-run]
+  project-os upgrade plan [path] [runtime provenance]
+  project-os upgrade apply [path] [runtime provenance] [--dry-run] [--by <agent>]
   project-os upgrade rollback UPGRADE-... --root <path> [--by <agent>]
   project-os onboard [path] [--json]
   project-os check [path] [--json]
@@ -81,6 +88,11 @@ Usage:
 Global options:
   --root <path>   Project root for state commands
   --json          Machine-readable output
+
+Runtime provenance (required by init, adopt, and upgrade plan/apply):
+  --runtime-repository https://github.com/sisodias/siso-project-os.git
+  --runtime-tag vX.Y.Z --runtime-tag-object <40-hex>
+  --runtime-commit <40-hex> --runtime-tree <40-hex>
 `
 
 function print(value, json = false) {
@@ -100,6 +112,7 @@ async function assertInitialized(root) {
 
 async function initProject(tokens) {
   const { positional, flags } = parseArgs(tokens)
+  const runtimeSource = await verifyRuntimeSource(flags)
   const root = resolve(positional[0] ?? process.cwd())
   const name = typeof flags.name === 'string' ? flags.name : basename(root)
   const summary = typeof flags.summary === 'string' ? flags.summary.trim() : ''
@@ -112,6 +125,7 @@ async function initProject(tokens) {
     '{{PROJECT_NAME_HTML}}': htmlEscape(name),
     '{{PROJECT_SUMMARY_JSON}}': JSON.stringify(summary),
     '{{DESIRED_OUTCOME_JSON}}': JSON.stringify(outcome),
+    ...runtimeTemplateReplacements(runtimeSource),
   }
 
   await copyRenderedTree(templateRoot, root, replacements, {
@@ -266,9 +280,10 @@ export async function main(argv) {
     if (!['plan', 'apply'].includes(subcommand)) throw new Error(`unknown adoption command\n\n${HELP}`)
     const { positional, flags } = parseArgs(rest)
     const root = commandRoot(positional, flags)
+    const runtimeSource = await verifyRuntimeSource(flags)
     let result = subcommand === 'plan'
-      ? await planProjectAdoption(root, flags)
-      : await applyProjectAdoption(root, { ...flags, dryRun: flags['dry-run'] === true })
+      ? await planProjectAdoption(root, { ...flags, runtimeSource })
+      : await applyProjectAdoption(root, { ...flags, runtimeSource, dryRun: flags['dry-run'] === true })
     if (subcommand === 'apply' && flags['dry-run'] !== true && await pathExists(join(root, '.project-os', 'project.json'))) {
       const activation = { build: null, architecture_baseline: null }
       try {

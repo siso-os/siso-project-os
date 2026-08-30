@@ -5,10 +5,9 @@
   "description": "Read canonical project state and return health, human gates, and unblocked next work without writing files.",
   "ownership": "INSTALL",
   "mode": "read-only",
-  "program": "npx",
+  "program": "node",
   "arguments": [
-    "--yes",
-    "github:sisodias/siso-project-os#v0.5.0",
+    ".project-os/project-os-launcher.mjs",
     "onboard",
     ".",
     "--json"

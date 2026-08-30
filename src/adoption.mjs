@@ -3,7 +3,7 @@ import { basename, dirname, join, resolve } from 'node:path'
 import { discoverProjectCapabilities } from './capabilities.mjs'
 import { validateSchema } from './schema.mjs'
 import { pathExists, schemasRoot, templateRoot, walkFiles, writeJsonAtomic } from './shared.mjs'
-import { writeInstallManifest } from './upgrade.mjs'
+import { runtimeTemplateReplacements, writeInstallManifest } from './upgrade.mjs'
 
 export const FULL_PROFILE_FILES = Object.freeze([
   '.agents/project-profile.json',
@@ -160,6 +160,7 @@ async function projectReplacements(root, options = {}) {
     '{{PROJECT_NAME_HTML}}': htmlEscape(name),
     '{{PROJECT_SUMMARY_JSON}}': JSON.stringify(typeof options.summary === 'string' ? options.summary.trim() : (existing.project_summary ?? '')),
     '{{DESIRED_OUTCOME_JSON}}': JSON.stringify(typeof options.outcome === 'string' ? options.outcome.trim() : (existing.desired_outcome ?? '')),
+    ...runtimeTemplateReplacements(options.runtimeSource),
   }
 }
 

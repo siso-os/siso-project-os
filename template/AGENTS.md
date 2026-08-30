@@ -11,8 +11,8 @@ canonical HTML operating authority without duplicating it here.
 
 1. Read this `AGENTS.md` — binding repository rules.
 2. Read `PROJECT-OS.html` — where each kind of project truth lives.
-3. Read the pinned launcher in `.project-os/project.json`, then use it to execute the logical
-   `project-os onboard --json` command with this repository as the root — project health, human
+3. Read the pinned launcher in `.project-os/project.json`, then execute
+   `node .project-os/project-os-launcher.mjs onboard . --json` — project health, human
    gates, and unblocked next work.
 4. Open the selected canonical `.agents/tasks/.../task.json` before acting.
 5. Create or use its linked run packet for a substantial attempt.
@@ -44,4 +44,4 @@ verification adapters, and optional providers through the declared capability in
   canonical tasks/runs and never become hidden writers.
 
 Run the pinned launcher before handoff. For this installed version:
-`npx --yes github:sisodias/siso-project-os#v0.5.0 check . --json`.
+`node .project-os/project-os-launcher.mjs check . --json`.

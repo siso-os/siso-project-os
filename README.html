@@ -9,27 +9,51 @@
 <body><main>
   <header class="hero" data-contract="project-kit-overview"><p class="status">Reusable package · HTML-first · verification-gated</p><h1>SISO Project Kit</h1><p>The complete project-local operating system for cold-pickup agents and humans: architecture orientation, tasks, missions, resume state, sprint lanes, run packets, write claims, independent verification, delivery proof, capability discovery, durable knowledge, UI decision campaigns, and an optional Agent Fleet Runtime Pack.</p><p>Codex CLI and Claude Code can operate it directly. It does not own terminals, models, credentials, or global agent identity; optional providers may add persistent panes, routing, messaging, and telemetry while the Fleet Pack supplies portable project contracts and admission evidence.</p></header>
 
-  <section data-contract="quickstart"><h2>Install it into a project</h2><div class="grid"><div class="card"><h3>New repository</h3><pre><code>npx --yes github:sisodias/siso-project-os#v0.5.0 init . \
+  <section data-contract="verified-release-acquisition"><h2>Acquire one verified release</h2><pre><code>SOURCE_ROOT=$(mktemp -d)
+trap 'rm -rf "$SOURCE_ROOT"' EXIT
+git clone --filter=blob:none --no-checkout https://github.com/sisodias/siso-project-os.git "$SOURCE_ROOT/source"
+git -C "$SOURCE_ROOT/source" fetch --depth=1 origin tag v0.5.1
+PROJECT_OS_TAG_OBJECT=&lt;PM_APPROVED_V0_5_1_TAG_OBJECT&gt;
+PROJECT_OS_COMMIT=&lt;PM_APPROVED_V0_5_1_COMMIT&gt;
+PROJECT_OS_TREE=&lt;PM_APPROVED_V0_5_1_TREE&gt;
+test "$(git -C "$SOURCE_ROOT/source" rev-parse refs/tags/v0.5.1)" = "$PROJECT_OS_TAG_OBJECT"
+test "$(git -C "$SOURCE_ROOT/source" cat-file -t "$PROJECT_OS_TAG_OBJECT")" = tag
+test "$(git -C "$SOURCE_ROOT/source" rev-parse 'refs/tags/v0.5.1^{}')" = "$PROJECT_OS_COMMIT"
+test "$(git -C "$SOURCE_ROOT/source" rev-parse 'refs/tags/v0.5.1^{}^{tree}')" = "$PROJECT_OS_TREE"
+git -C "$SOURCE_ROOT/source" checkout --detach "$PROJECT_OS_COMMIT"
+test -z "$(git -C "$SOURCE_ROOT/source" status --porcelain)"
+
+project_os() {
+  node "$SOURCE_ROOT/source/bin/siso-project-os.mjs" "$@" \
+    --runtime-repository https://github.com/sisodias/siso-project-os.git \
+    --runtime-tag v0.5.1 --runtime-tag-object "$PROJECT_OS_TAG_OBJECT" \
+    --runtime-commit "$PROJECT_OS_COMMIT" --runtime-tree "$PROJECT_OS_TREE"
+}</code></pre><p>Substitute only release objects published by the release authority. Project OS verifies the annotated tag, commit, tree, clean checkout, public origin, and direct Node bin before it writes a consumer. npm, npx, global installs, private paths, and package-manager caches are not part of this contract.</p></section>
+
+  <section data-contract="quickstart"><h2>Install it into a project</h2><div class="grid"><div class="card"><h3>New repository</h3><pre><code>project_os init . \
   --name "My Project" \
   --summary "What this software is" \
-  --outcome "The user outcome it creates"</code></pre></div><div class="card"><h3>Existing repository</h3><pre><code>npx --yes github:sisodias/siso-project-os#v0.5.0 adopt plan . --json
-npx --yes github:sisodias/siso-project-os#v0.5.0 adopt apply . --json
-open .project-os/migration/project-kit-migration.html</code></pre></div></div><p>Adoption creates missing files, retains identical files, appends only a thin runtime route to existing <code>AGENTS.md</code>/<code>CLAUDE.md</code>, and preserves every other collision for explicit review. It never silently overwrites a project authority.</p></section>
+  --outcome "The user outcome it creates"
+node .project-os/project-os-launcher.mjs onboard . --json</code></pre></div><div class="card"><h3>Existing repository</h3><pre><code>project_os adopt plan . --json
+project_os adopt apply . --json
+node .project-os/project-os-launcher.mjs onboard . --json
+open .project-os/migration/project-kit-migration.html</code></pre></div></div><p>The installed launcher derives the project root from its own file, verifies the install-bound release in a user cache on every invocation, works from a verified warm cache without network access, and fails closed instead of repairing or falling back. Adoption creates missing files, retains identical files, appends only a thin runtime route to existing <code>AGENTS.md</code>/<code>CLAUDE.md</code>, and preserves every other collision for explicit review.</p></section>
 
-  <section data-contract="cold-pickup"><h2>What every new agent does</h2><ol><li>Read <code>AGENTS.md</code>, the engine loader shim.</li><li>Load <code>.agents/skills/project-operator/SKILL.md</code>, which points to the canonical HTML authority.</li><li>Read <code>PROJECT-OS.html</code> and <code>FILE-TREE.html</code>.</li><li>Run <code>project-os onboard --json</code>.</li><li>Open the chosen canonical task, mission/resume state, and linked run packet.</li><li>Reserve its concrete write set, return evidence, obtain independent verification, and land through a delivery receipt.</li><li>Run <code>project-os check --json</code> before handoff.</li></ol><p>Humans use <code>.project-os/generated/onboarding.html</code> and <code>knowledge-onboarding.html</code>; both are deterministic read-only projections over the same JSON/JSONL truth.</p></section>
+  <section data-contract="cold-pickup"><h2>What every new agent does</h2><ol><li>Read <code>AGENTS.md</code>, the engine loader shim.</li><li>Load <code>.agents/skills/project-operator/SKILL.md</code>, which points to the canonical HTML authority.</li><li>Read <code>PROJECT-OS.html</code> and <code>FILE-TREE.html</code>.</li><li>Run <code>node .project-os/project-os-launcher.mjs onboard . --json</code>.</li><li>Open the chosen canonical task, mission/resume state, and linked run packet.</li><li>Reserve its concrete write set, return evidence, obtain independent verification, and land through a delivery receipt.</li><li>Run <code>node .project-os/project-os-launcher.mjs check . --json</code> before handoff.</li></ol><p>Humans use <code>.project-os/generated/onboarding.html</code> and <code>knowledge-onboarding.html</code>; both are deterministic read-only projections over the same JSON/JSONL truth.</p></section>
 
   <section data-contract="packs"><h2>Six core packs plus optional Fleet Runtime</h2><div class="grid"><div class="card"><h3>Architecture</h3><p>Stable file map, required paths, normalized operations, ambiguity scoring, and a non-regression baseline.</p></div><div class="card"><h3>Execution lifecycle</h3><p>Tasks, mission ownership, immutable resumes, dependency-aware claims, sprint lanes, run units, packets, returns, events, gates, and terminal census.</p></div><div class="card"><h3>Verification and delivery</h3><p>Concrete write reservations, attempt receipts, independent verifier lineage, output classification, landing plans, and remote-SHA equality proof.</p></div><div class="card"><h3>Knowledge spine</h3><p>HTML authorities with embedded metadata, proof/decision/run ledgers, repo facts, edit maps, research dead ends, durable memory, and anti-amnesia views.</p></div><div class="card"><h3>Capabilities</h3><p>Bounded discovery of skills, agents, commands, recipes, and adapters; install/depend/project-local/adapter/omit ownership; provider doctoring and collision-safe scaffolders.</p></div><div class="card"><h3>UI Hub</h3><p>Task-linked intent, research, divergent directions, candidate manifests, generated comparison galleries, human review import, exhaustive decisions, implementation receipts, visual verification, and task evidence folds.</p></div><div class="card"><h3>Agent Fleet Runtime</h3><p>Optional versioned bootstrap, exclusive domains, elastic capacity, verifier reserve, machine gates, Sol/Luna contracts, durable callbacks, admission receipts, and Mission Control projections.</p></div></div></section>
 
   <section data-contract="fleet-quickstart"><h2>Install the optional Agent Fleet Runtime Pack</h2><pre><code>cp &lt;package&gt;/packs/fleet/fleet.bootstrap.example.json ./fleet.bootstrap.json
-project-os fleet plan . --config fleet.bootstrap.json --json
-project-os fleet init . --config fleet.bootstrap.json --json
-project-os fleet check . --json</code></pre><p>The complete plan must pass before any file is written. It refuses ownership overlap (including case-folded paths), reserved control-state scopes, missing or redirected repository/evidence boundaries, absent verifier capacity, secret-shaped values, machine pressure, incompatible Project OS versions, and differing existing content. Managed fleet contracts and write-once admission receipts are digest-checked. See <code>docs/fleet-runtime-pack.html</code>.</p></section>
+node .project-os/project-os-launcher.mjs fleet plan . --config fleet.bootstrap.json --json
+node .project-os/project-os-launcher.mjs fleet init . --config fleet.bootstrap.json --json
+node .project-os/project-os-launcher.mjs fleet check . --json</code></pre><p>The complete plan must pass before any file is written. It refuses ownership overlap (including case-folded paths), reserved control-state scopes, missing or redirected repository/evidence boundaries, absent verifier capacity, secret-shaped values, machine pressure, incompatible Project OS versions, and differing existing content. Managed fleet contracts and write-once admission receipts are digest-checked. See <code>docs/fleet-runtime-pack.html</code>.</p></section>
 
   <section data-contract="command-map"><h2>Command families</h2><table><thead><tr><th>Family</th><th>Purpose</th></tr></thead><tbody><tr><td><code>init · adopt · upgrade · onboard · build · check · doctor</code></td><td>Install, migrate, version, orient, project, validate, and resolve providers.</td></tr><tr><td><code>architecture · capabilities · scaffold</code></td><td>Assess the repository and discover or create project-local capabilities.</td></tr><tr><td><code>task · mission · resume · claim</code></td><td>Select canonical work, preserve lead state, and reserve writes.</td></tr><tr><td><code>sprint · run · delivery</code></td><td>Coordinate lanes, execute immutable packets, verify attempts, and land proof.</td></tr><tr><td><code>fleet plan · init · check · build · admit</code></td><td>Install and operate the optional evidence-gated fleet contract without replacing provider runtime control.</td></tr><tr><td><code>ui</code></td><td>Run the strict design-to-decision-to-proof loop linked to a canonical task.</td></tr></tbody></table><p>Run <code>project-os help</code> for the concrete subcommands and options.</p></section>
 
-  <section data-contract="upgrade"><h2>Upgrade without overwriting project authority</h2><pre><code>npx --yes github:sisodias/siso-project-os#v0.5.0 upgrade plan . --json
-npx --yes github:sisodias/siso-project-os#v0.5.0 upgrade apply . --by agent-name --json
-npx --yes github:sisodias/siso-project-os#v0.5.0 upgrade rollback UPGRADE-... --root . --by agent-name --json</code></pre><p>Install manifests hash the files Project OS actually owns. Upgrades replace only unchanged managed files or files matching a checked-in historical release baseline, preserve project edits, take internal backups, and emit HTML+JSON receipts.</p></section>
+  <section data-contract="upgrade"><h2>Upgrade without overwriting project authority</h2><pre><code># Use project_os from the verified target checkout above.
+project_os upgrade plan . --json
+project_os upgrade apply . --by agent-name --json
+node .project-os/project-os-launcher.mjs upgrade rollback UPGRADE-... --root . --by agent-name --json</code></pre><p>Install manifests hash the files Project OS actually owns. Upgrades replace only unchanged managed files or files matching a checked-in historical release baseline, preserve modified configuration, commands, and launchers as collisions, take internal backups, and emit target Git provenance in HTML+JSON receipts. Rollback refuses changed targets or missing backups, restores exact prior bytes, and returns the verified source-checkout/direct-Node route for the restored release.</p></section>
 
   <section data-contract="format-law"><h2>Format law</h2><p>Canonical machine state is JSON or append-only JSONL. Every substantive guide, map, index, migration report, review surface, and generated cockpit is deterministic HTML with an embedded JSON contract. Markdown remains only where an agent engine requires a loader: <code>AGENTS.md</code>, <code>CLAUDE.md</code>, and <code>SKILL.md</code>.</p></section>
 

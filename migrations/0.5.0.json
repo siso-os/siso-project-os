@@ -1,0 +1,651 @@
+{
+  "schema_version": 1,
+  "package": "@siso/project-os",
+  "version": "0.5.0",
+  "files": [
+    {
+      "path": ".project-os/schemas/agent-packet.schema.json",
+      "sha256": "f2bd3874483bab2c7a54b487021e8c0e49f212ff0e6a5bafaeaeca775cd878c9",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/agent-profile.schema.json",
+      "sha256": "3344478298026817435cd4077b0fbc8a2cf0a80b2d0184d61a2ba64dddf0938f",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/architecture-profile.schema.json",
+      "sha256": "ef3575666b18ce0eb977d592ea6da250895c0b929f234334ca92f7a58dca7758",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/attempt-receipt.schema.json",
+      "sha256": "0f367b1900ac4b66bc56b22eb4f40ea9e6d8a781968a6b7e8440504505948762",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/capability-manifest.schema.json",
+      "sha256": "33fc4eb816339a82de0683abbdff4ca16d4bfdf14aae0457e2c83a5a22910c7d",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/capability.schema.json",
+      "sha256": "0bbb3dc1c06ee2518721f54a82684c32eda9964e8d78910944ba32939951f99d",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/claim.schema.json",
+      "sha256": "45a0042f8a77c7fa2ef3e16af9aa5ac6cf67e505542da75c970cc257d7e7472b",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/command.schema.json",
+      "sha256": "601b6f7f17deec6c6845d83f5ad619ba9d74cc42e89b7d0ff85b930cdeb2f7fe",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/decision.schema.json",
+      "sha256": "7ffbb73e0b37d33558c19ae082c0cdf7a1cc404514059be339411f62135b4cd4",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/delivery-plan.schema.json",
+      "sha256": "3dada4ad1f242d0783b059a4a2ced2bef9e3c74fdef1130d7f4ea8681c08a981",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/document.schema.json",
+      "sha256": "c0b98179854d9f9179eb219709cedd0d95e5c8584626325837f04247b5a9e1ca",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/failure-result.schema.json",
+      "sha256": "c1955731e29c60b05b82b5e4ba51cd077d7e328f400b543d7d1622f3fa5eace6",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/fleet-admission-input.schema.json",
+      "sha256": "67460747b67ef0d72e8a8262d4dbde63180b6550ea07e0bc82942a7dd9a528ad",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/fleet-admission-receipt.schema.json",
+      "sha256": "cae482330592f84b5c9b563396710a4f474ec6d1c1f5a180be1afcaf9f395808",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/fleet-bootstrap.schema.json",
+      "sha256": "0f2f8eaea58c7ee949b5d9d31bd2ef7715ec6260b4664daa2ac21bedc1387382",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/fleet-callback.schema.json",
+      "sha256": "fd7647068fd307dac3024cb04730c69ed3f1bf3744fa898308674c19199d8795",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/fleet-domain.schema.json",
+      "sha256": "30144c6ca993e8d2fdff9c24113fcd49a609edab22498cac19ef62c819914177",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/fleet-pack.schema.json",
+      "sha256": "3b7cb69936a1053444c4879731f32ac73c6c0c631f85cae08367f6d2353a1b62",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/fleet-policy.schema.json",
+      "sha256": "6740f2b2c5567b161feff49ff8e0db6a748b8855770b392d51f5496ff0dbd87f",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/fleet-process-plan.schema.json",
+      "sha256": "8b554f8308f3f55d5bf7c9d9e8d019f126077e606bb8d7bfd64777d9136e8b02",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/fleet-program.schema.json",
+      "sha256": "2d54d9a8d3142a9a951739184a023fe76315f5bec39a875008a6578bf01b4499",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/fleet-repositories.schema.json",
+      "sha256": "b071463c1b54ce0f1d37c9970ef26346cae5d2f764f45b44269b2c083b744867",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/fleet-source-contract.schema.json",
+      "sha256": "bf1350bbd07e1c2d3b2108f4043a35d1816716ae3b48667c0c192871c50bc802",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/fleet-task-graph.schema.json",
+      "sha256": "a9f1b0719cbe5d2a22f09b54b6e95530c2d5fd443b6a956be9187ac653837b28",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/fleet-team-state.schema.json",
+      "sha256": "36fba5571fe0bec4007ca38bec29f4001c306a3eb62814bb85aecd1c47b7fc77",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/gate-receipt.schema.json",
+      "sha256": "28585bd51285f42e1dc9405c3bb47a4c2d6d6615ab80d97cf982de03d9af4b1c",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/install-manifest.schema.json",
+      "sha256": "45081e8a671f379e48f39c889c5de068404b25fd3a8d4ae4b9690d2296080bf1",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/landing-receipt.schema.json",
+      "sha256": "4c57dccb5851247469d4c50fb1c25472a1cd7ebc54c48a8eea2480be6893cf5b",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/lane-packet.schema.json",
+      "sha256": "5a7bb91b460f9667df067b2f35a52ff8cfcf3402d0e22f7341643dcb4c1751e1",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/lane-state.schema.json",
+      "sha256": "8328f6a3d9866618e3393d6dc8ff54272bfe5914842f815c416c17fc82d8894b",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/memory.schema.json",
+      "sha256": "666d4bdab046a85d87df0698aaf9dc96c9c514245e486372727761e8ce259cb1",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/mission.schema.json",
+      "sha256": "206ae6c05911cb03dfe354d53ee29fe9b95690233cb9202dac8863983d51a755",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/project-profile.schema.json",
+      "sha256": "4b85e8c3a4fe851b693b70b667901631a60e03933843c1f541197aa8f91b8102",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/project.schema.json",
+      "sha256": "ef4d3c61c3569d0f10a6592d5bb18268202def97e40f1efaa81d15050e314d0e",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/research-packet.schema.json",
+      "sha256": "8035f14a9fb237c224c9f0f8edc36dc9bc2a534058f14d4c3a12045da471c28e",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/resume-snapshot.schema.json",
+      "sha256": "c3c8a05647cfbfa44efb232f9044bf6e4d11682dd427ab6f6429e279fc30a8ea",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/run-discovery.schema.json",
+      "sha256": "d09a4aca90f1594d0a739837aa0721b879de4504bb866da56d4bca722ad01aa5",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/run-event.schema.json",
+      "sha256": "093938e9328cbfa6ed299b833d5d5c5279d560d9ab8e3112e24c717460006752",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/run-queue.schema.json",
+      "sha256": "a61b0ff01353146a8e3246fa43304f35a487f3f7d43ed067fb081789f4136d62",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/run-return.schema.json",
+      "sha256": "a06faed8fc88ff24d6dc1a5a98c2fac93da199252e361d507a41fadfa21eb401",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/run.schema.json",
+      "sha256": "d306e919e2076f92aab1bb2c1936363ff0418de92cde32878d34e416bcad3a3e",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/sprint.schema.json",
+      "sha256": "546e579c1c97abf20c54442cc9395c0b4c1df90fa2d49c1f4c46a000275c651b",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/task.schema.json",
+      "sha256": "2b4540efeb363f4d007314f77bef12ae54d78dafc6b7ddb5c67263bd65f8de4d",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/ui-campaign.schema.json",
+      "sha256": "fc7fab05a2fde2c24935f1aecb8a30f24a64e8d8cdf4e85aa4acaa0e2966e0de",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/ui-candidate-manifest.schema.json",
+      "sha256": "c801b93b863791d44cea977a23c87b12f192fc296412152627c0e9882a2a0309",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/ui-decision.schema.json",
+      "sha256": "a3f52fc168faebf903a1c41e456e359115b96f1686f95a19d6d78379a5f9ed38",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/ui-direction.schema.json",
+      "sha256": "17321316512bf4ea1529d04ded7dbd230e7b15f01dc4aac6b65a05dfff145419",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/ui-receipt.schema.json",
+      "sha256": "085d3026d144c887141051966a424fd8023cf37787806c95aa38b0fb88e2ab54",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/ui-review-response.schema.json",
+      "sha256": "03958edf9df654ea671834b7443657a733c9acac9d120b44ec87bed19641b9b9",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/ui-task-evidence.schema.json",
+      "sha256": "f81dc035ef52014a61d5a32181999e5be86ddb6a0ce2d2605dc281c595b436dd",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/upgrade-record.schema.json",
+      "sha256": "ea502a9b8c732423962ce0f02463597c4d4d5f8702e77c0af29575b44e9d53bb",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/verification-adapter.schema.json",
+      "sha256": "020d35cb56244e1b362e3e1680c57006ec56bb201a55f00ed6385e93b4dd3ac1",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/verification-receipt.schema.json",
+      "sha256": "2150736de3177697effdc77379e21ba0aa869f98ba1a6e4baff6c7c9229608fe",
+      "templated": false
+    },
+    {
+      "path": ".project-os/schemas/work-claim.schema.json",
+      "sha256": "a5debb5c4ed9ef3b8731f98f2a02bbdc9db0ab829e1baa8a01d0ff1b8ff96df3",
+      "templated": false
+    },
+    {
+      "path": ".agents/adapters/project-os-check.json",
+      "sha256": "ea5f2beedee317b2bb60adf31f9bb0e8483f4248c4d45407df3b32649bf782e2",
+      "templated": false
+    },
+    {
+      "path": ".agents/agents/project-operator.json",
+      "sha256": "159d772e52268487a7461ac1662b70b0bb34ea14f3983452a5fbe1c4fa54cf76",
+      "templated": false
+    },
+    {
+      "path": ".agents/briefs/CURRENT.html",
+      "sha256": "6780316fa2e36c9a8161a76a3bd757109a8f306ca60c20da89c77cdaf7da6560",
+      "templated": false
+    },
+    {
+      "path": ".agents/briefs/index.html",
+      "sha256": "b02dcf140ee6811c420280dbdd235e3249f1efa5dcca83e963751fd4fa5c3eb8",
+      "templated": false
+    },
+    {
+      "path": ".agents/briefs/snapshots/.gitkeep",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "templated": false
+    },
+    {
+      "path": ".agents/capabilities/project-os.json",
+      "sha256": "b4e9bb521c8c7e0f922e1a0472835dd5ba406cf348a345a1310a28de9cd3ee83",
+      "templated": false
+    },
+    {
+      "path": ".agents/commands/project-os-check.json",
+      "sha256": "c1b8fcc22d389b8e5de60dfe6f788285a465d214fe01b72b891d8e923deb6860",
+      "templated": false
+    },
+    {
+      "path": ".agents/commands/project-os-onboard.json",
+      "sha256": "5d81538fe4ca82ade3c62a0376114298d35853e67346da692ae8649f4091b254",
+      "templated": false
+    },
+    {
+      "path": ".agents/delivery/.locks/.gitkeep",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "templated": false
+    },
+    {
+      "path": ".agents/delivery/index.html",
+      "sha256": "f70b8f0dac988571a8e015475dca5cdaf11be207b623b1bc808f2fb91da36e05",
+      "templated": false
+    },
+    {
+      "path": ".agents/index.html",
+      "sha256": "96065731ca34dd0ce5f5e2282433681ee7b62fe70cc2e5f481d7b9167317cfe7",
+      "templated": false
+    },
+    {
+      "path": ".agents/memory/index.html",
+      "sha256": "9aac578360115f8ad4434e6cc88fe1fc51b306f15e344ca345b4fb26ca5ea319",
+      "templated": false
+    },
+    {
+      "path": ".agents/missions/.quarantine/.gitkeep",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "templated": false
+    },
+    {
+      "path": ".agents/missions/history/.gitkeep",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "templated": false
+    },
+    {
+      "path": ".agents/missions/index.html",
+      "sha256": "d4c8af58067c65d3f0a9d21f2c7fa333878aae45f727d51238ff0f2468407de4",
+      "templated": false
+    },
+    {
+      "path": ".agents/project-profile.json",
+      "sha256": "446a44791035a351a31c6c50aa3702e1ae292a975c969555d053cf71a73878e7",
+      "templated": false
+    },
+    {
+      "path": ".agents/runs/.gitkeep",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "templated": false
+    },
+    {
+      "path": ".agents/runs/index.html",
+      "sha256": "c8f84874852b3b475e4395debd01c7d7997ec488747ab2241af36143e670e81f",
+      "templated": false
+    },
+    {
+      "path": ".agents/skills/project-operator/OPERATOR.html",
+      "sha256": "a9165c93baa8b0764104f080f5aa1486e186c16da74b0793d9af0bb482a334f5",
+      "templated": false
+    },
+    {
+      "path": ".agents/skills/project-operator/SKILL.md",
+      "sha256": "34915e3e5b53f22f1b27d02f4de3f09c6ff082555e5577484fcd6e5cb28c8b5d",
+      "templated": false
+    },
+    {
+      "path": ".agents/sprints/.gitkeep",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "templated": false
+    },
+    {
+      "path": ".agents/sprints/index.html",
+      "sha256": "3219e25ff997ff8f84d3172edd225aeca8958bd24f943dfba31df90a39838385",
+      "templated": false
+    },
+    {
+      "path": ".agents/tasks/.locks/.gitkeep",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "templated": false
+    },
+    {
+      "path": ".agents/tasks/archived/.gitkeep",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "templated": false
+    },
+    {
+      "path": ".agents/tasks/backlog/.gitkeep",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "templated": false
+    },
+    {
+      "path": ".agents/tasks/blocked/.gitkeep",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "templated": false
+    },
+    {
+      "path": ".agents/tasks/cancelled/.gitkeep",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "templated": false
+    },
+    {
+      "path": ".agents/tasks/completed/.gitkeep",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "templated": false
+    },
+    {
+      "path": ".agents/tasks/in_progress/.gitkeep",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "templated": false
+    },
+    {
+      "path": ".agents/tasks/index.html",
+      "sha256": "0a6f36ffd562bbbc233666b4c36201b76ef6d76cf23d70674f2b9181d345dcbf",
+      "templated": false
+    },
+    {
+      "path": ".agents/work-claims/.locks/.gitkeep",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "templated": false
+    },
+    {
+      "path": ".agents/work-claims/active/.gitkeep",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "templated": false
+    },
+    {
+      "path": ".agents/work-claims/index.html",
+      "sha256": "99bc2fb33ce485fa865912d6e3a80f85893aefc8d11e7bd146b060422820cc39",
+      "templated": false
+    },
+    {
+      "path": ".agents/work-claims/released/.gitkeep",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "templated": false
+    },
+    {
+      "path": ".project-os/architecture/profile.json",
+      "sha256": "cb4e176ff5250a332bde89f25a12380a1b8466d83642ce32c208907004e0d982",
+      "templated": false
+    },
+    {
+      "path": ".project-os/project.json",
+      "sha256": "4a17f40b9600b2ea9c152e82f049f25c63c034e0149aa345873b19ad403c6db7",
+      "templated": true,
+      "template_source": "{\n  \"schema_version\": 1,\n  \"project_os_version\": \"0.5.0\",\n  \"launcher\": {\n    \"program\": \"npx\",\n    \"arguments\": [\n      \"--yes\",\n      \"github:sisodias/siso-project-os#v0.5.0\"\n    ]\n  },\n  \"project_name\": {{PROJECT_NAME_JSON}},\n  \"project_summary\": {{PROJECT_SUMMARY_JSON}},\n  \"desired_outcome\": {{DESIRED_OUTCOME_JSON}},\n  \"canonical_task_system\": \"filesystem\",\n  \"external_task_mirror\": null,\n  \"prefixes\": {\n    \"task\": \"TASK\",\n    \"sprint\": \"SPRINT\",\n    \"run\": \"RUN\",\n    \"ui\": \"UI\"\n  },\n  \"generated_dir\": \".project-os/generated\",\n  \"verification_commands\": [],\n  \"artifact_policy\": {\n    \"tracked_final_evidence_max_bytes\": 5000000,\n    \"raw_artifacts\": \"external-or-git-lfs\"\n  }\n}\n"
+    },
+    {
+      "path": ".uihub/README.html",
+      "sha256": "4191b5cbb28580be8ead57ef763418a7fc1f7d3b585e963884380253ce8cd640",
+      "templated": false
+    },
+    {
+      "path": ".uihub/_templates/adapter-capability.json",
+      "sha256": "331923fa3be2306eacb27e2f9d4fd793b7835018138bd5f0f438fd76f8b7d5b9",
+      "templated": false
+    },
+    {
+      "path": ".uihub/_templates/adapter-receipt.json",
+      "sha256": "f75aefee5e29c93734e2da0320c60eda5487ae75f6ff6749223f829354b5b753",
+      "templated": false
+    },
+    {
+      "path": ".uihub/_templates/brief.html",
+      "sha256": "e6935b73d2ae8dbc6419c42c553dbf18e3a11fc11a8fca1104308f94a5c52489",
+      "templated": false
+    },
+    {
+      "path": ".uihub/_templates/campaign.json",
+      "sha256": "aa613c1df82e795f8d4c5ccf354fb96c7811a757756c5c5f8e8f32f145908c73",
+      "templated": false
+    },
+    {
+      "path": ".uihub/_templates/candidate-manifest.json",
+      "sha256": "c53d18be020243129d461a480f183b9007f3d22cd6878be94a168d5ff634f738",
+      "templated": false
+    },
+    {
+      "path": ".uihub/_templates/constraints.json",
+      "sha256": "be14092de0d42bf5c4299b54dcc821ad675e2a41a9f83cf8172d7e7c3ed3d158",
+      "templated": false
+    },
+    {
+      "path": ".uihub/_templates/decision.json",
+      "sha256": "fbf8580059cfe3e1314cbac6a055151b9ce34e21a68f281a8b8a15733dc7c6c9",
+      "templated": false
+    },
+    {
+      "path": ".uihub/_templates/direction.json",
+      "sha256": "ec13060e20679614af857dea572ed1cf1974676912143114a02f2da228b97e37",
+      "templated": false
+    },
+    {
+      "path": ".uihub/_templates/implementation-receipt.json",
+      "sha256": "8f6d534b9fb08e14285b2d3ad07f4a7966176393fb44dd425fe00c2e606a458b",
+      "templated": false
+    },
+    {
+      "path": ".uihub/_templates/research.html",
+      "sha256": "282abb697a6bb0496ba33c512e934664e1eb2b0ee9613b8cd9e955408d0eca0c",
+      "templated": false
+    },
+    {
+      "path": ".uihub/_templates/review-response.json",
+      "sha256": "a5fee9938d7ab8a824dd848334a5f258c2fc09605ffb339d349b6564cf15176c",
+      "templated": false
+    },
+    {
+      "path": ".uihub/_templates/review/index.html",
+      "sha256": "e07a1061420e18d6ea0f19903e34f000843a09da5a46e5c446f846341a3f6f62",
+      "templated": false
+    },
+    {
+      "path": ".uihub/_templates/task-evidence.json",
+      "sha256": "cb35624ad90e64177b095dd7e8e90d1d90526092c20cbc24584341a42eae3cb6",
+      "templated": false
+    },
+    {
+      "path": ".uihub/_templates/verification-receipt.json",
+      "sha256": "06aa32f0176876b6734dfb3de1969b3ff2daf599df572df557ccfb4da7c95bc8",
+      "templated": false
+    },
+    {
+      "path": ".uihub/adapters/INDEX.html",
+      "sha256": "dbd0bba7b7ae143636220ca379c90377057e88c04529894913d23d258956f745",
+      "templated": false
+    },
+    {
+      "path": ".uihub/campaigns/INDEX.html",
+      "sha256": "101e38c7e0822032adab4ecc94d90f82372672b4454e601860103a8416b05941",
+      "templated": false
+    },
+    {
+      "path": ".uihub/generated/INDEX.html",
+      "sha256": "c3b26987f0a981104c7623269a59fcc724e33025849ce634706434488d59d181",
+      "templated": false
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "e9d79569cf9914142a5d5c1d863a701a5c3532d1acfb27a2de877a8eadf25cc7",
+      "templated": true,
+      "template_source": "# {{PROJECT_NAME}} — Agent Router\n\n<!-- siso-project-os:v1 -->\n\nThis repository uses SISO Project OS for project-local agent state.\n\nLoad `.agents/skills/project-operator/SKILL.md` as the runtime entrypoint; it routes to the\ncanonical HTML operating authority without duplicating it here.\n\n## Start here\n\n1. Read this `AGENTS.md` — binding repository rules.\n2. Read `PROJECT-OS.html` — where each kind of project truth lives.\n3. Read the pinned launcher in `.project-os/project.json`, then use it to execute the logical\n   `project-os onboard --json` command with this repository as the root — project health, human\n   gates, and unblocked next work.\n4. Open the selected canonical `.agents/tasks/.../task.json` before acting.\n5. Create or use its linked run packet for a substantial attempt.\n6. Verify, run the pinned launcher's `check . --json` arguments, and hand off from repository evidence.\n\nHumans can open `.project-os/generated/onboarding.html` for the same delivery map. The knowledge\nspine rules live at `docs/project-os/INDEX.html`; the durable onboarding contract is\n`docs/project-os/ONBOARDING.html`; task-linked UI work lives at `.uihub/README.html`.\n\n## Runtime and capability boundary\n\nProject OS owns project records and packets; it does not replace the agent CLI that is reading this\nfile. Codex CLI operates through this `AGENTS.md`; Claude Code operates through `CLAUDE.md`. Either\nruntime can execute the complete single-agent lifecycle directly. Optional orchestration providers\nmay add spawning, model routing, persistent panes, messaging, or telemetry, but their absence never\nblocks core Project OS operation. Discover project-local skills, roles, commands, proven recipes,\nverification adapters, and optional providers through the declared capability inventory.\n\n## Binding rules\n\n- A plan is not committed work until it has one canonical task ID.\n- Dashboards, indexes, and HTML views are projections, never alternate writers.\n- Every run packet names its parent task, write fence, return shape, verification, and stop condition.\n- Checks are read-only. Repairs and archive/fold operations are explicit.\n- Durable lessons go to `.agents/memory/`; attempt-specific material stays with its run or task evidence.\n- UI campaigns reference canonical task IDs and cannot own an independent backlog.\n- Preserve unrelated dirty work and verify completion from repository evidence, not an agent claim.\n- Product-specific commands and policies remain project-local adapters; their receipts link back to\n  canonical tasks/runs and never become hidden writers.\n\nRun the pinned launcher before handoff. For this installed version:\n`npx --yes github:sisodias/siso-project-os#v0.5.0 check . --json`.\n"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "4778631906246bef3a1f1a380d3abe86f0800ffd16ece011e635e9a3e14de33b",
+      "templated": false
+    },
+    {
+      "path": "FILE-TREE.html",
+      "sha256": "c8eced06c2a0cc5d4dbdc75506ed985c5c70313c84256a98763ddee6ba089133",
+      "templated": true,
+      "template_source": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n  <meta name=\"generator\" content=\"siso-project-os:architecture-v2\">\n  <title>{{PROJECT_NAME_HTML}} — What Lives Where</title>\n  <style>\n    :root{color-scheme:light dark;font:16px/1.55 system-ui,sans-serif}body{max-width:72rem;margin:0 auto;padding:2rem;color:#172033;background:#f6f8fb}\n    main{background:#fff;border:1px solid #dce2ea;border-radius:1rem;padding:clamp(1rem,3vw,2.5rem);box-shadow:0 1rem 3rem #18203012}h1,h2{line-height:1.15}\n    table{width:100%;border-collapse:collapse}th,td{text-align:left;vertical-align:top;padding:.7rem;border-bottom:1px solid #e3e7ed}code{overflow-wrap:anywhere}\n    .meta{color:#5b6574}.rule{border-left:.3rem solid #635bff;padding:.5rem 1rem;background:#f3f2ff}@media(prefers-color-scheme:dark){body{color:#e8edf5;background:#10131a}main{background:#171b24;border-color:#303746}.meta{color:#aeb7c4}.rule{background:#211f3a}th,td{border-color:#303746}}\n  </style>\n</head>\n<body>\n<main data-contract=\"project-file-tree\">\n  <p class=\"meta\">Stable first-read map · generated status belongs in <code>.project-os/generated/</code></p>\n  <h1>{{PROJECT_NAME_HTML}} — What Lives Where</h1>\n  <p class=\"rule\">Extend this map when real domains appear. Do not reserve speculative folders or turn this into a volatile status page.</p>\n  <table>\n    <thead><tr><th>Path</th><th>Ownership contract</th></tr></thead>\n    <tbody>\n      <tr><td><code>AGENTS.md</code></td><td>Binding repository rules; nearest nested AGENTS.md wins.</td></tr>\n      <tr><td><code>PROJECT-OS.html</code></td><td>Question → canonical project-state destination.</td></tr>\n      <tr><td><code>FILE-TREE.html</code></td><td>This architecture, ownership, and dependency map.</td></tr>\n      <tr><td><code>script/</code></td><td>Normalized bootstrap, setup, test, server, and update entrypoints.</td></tr>\n      <tr><td><code>.project-os/</code></td><td>Project Kit configuration, schemas, baselines, and generated views.</td></tr>\n      <tr><td><code>.agents/</code></td><td>Canonical work, execution attempts, packets, memory, and capabilities.</td></tr>\n      <tr><td><code>.uihub/</code></td><td>Task-linked UI campaigns, decisions, and visual proof.</td></tr>\n      <tr><td><code>docs/</code></td><td>HTML knowledge, decisions, research, run evidence, and proven recipes.</td></tr>\n    </tbody>\n  </table>\n  <h2>Code placement contract</h2>\n  <ul>\n    <li>Partition application code by domain or feature, not one repository-wide technical layer.</li>\n    <li>A named domain folder is a dependency boundary; cross-domain access uses its declared public contract.</li>\n    <li>Generated or derived code lives in an isolated sibling path and is never mixed with authored source.</li>\n    <li>Add nested <code>AGENTS.md</code> only where a subtree has real local invariants.</li>\n    <li>Folder names are stable addresses; append before reorganizing.</li>\n  </ul>\n  <h2>Project-specific domains</h2>\n  <p>No domains have been declared yet. Add one table row per real domain with its public surface and cheapest verification command.</p>\n</main>\n<script type=\"application/json\" id=\"project-file-tree-state\">{\"schema_version\":1,\"project_name\":{{PROJECT_NAME_JSON}},\"layout_axis\":\"domain-first\",\"generated_code\":\"isolated\",\"public_surfaces\":\"explicit\",\"domains\":[]}</script>\n</body>\n</html>\n"
+    },
+    {
+      "path": "PROJECT-OS.html",
+      "sha256": "fae74a0f7fb22642010ef6231f5b1f8c6bb7e59cf0c231fc9643c1973627c288",
+      "templated": true,
+      "template_source": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n  <meta name=\"generator\" content=\"siso-project-os:operating-map-v3\">\n  <title>{{PROJECT_NAME_HTML}} — Project Operating Map</title>\n  <style>:root{font:16px/1.55 system-ui,sans-serif;color:#172033;background:#f6f8fb}body{max-width:76rem;margin:auto;padding:2rem}main{background:#fff;padding:2rem;border:1px solid #dce2ea;border-radius:1rem}table{width:100%;border-collapse:collapse}th,td{text-align:left;vertical-align:top;padding:.7rem;border-bottom:1px solid #e3e7ed}code{overflow-wrap:anywhere}pre{white-space:pre-wrap;background:#f2f5f9;padding:1rem;border-radius:.6rem}@media(max-width:42rem){body{padding:.5rem}main{padding:1rem}table,tbody,tr,th,td{display:block}tr{padding:.6rem 0}th,td{border:0;padding:.15rem 0}}@media(prefers-color-scheme:dark){:root{color:#e8edf5;background:#10131a}main{background:#171b24;border-color:#303746}th,td{border-color:#303746}pre{background:#10131a}}</style>\n</head>\n<body>\n<main data-contract=\"project-operating-map\">\n  <h1>{{PROJECT_NAME_HTML}} — Project Operating Map</h1>\n  <p>One question, one canonical destination. JSON/JSONL is machine state; HTML is the human and agent-readable operating surface. Generated pages are projections, never alternate writers.</p>\n  <table>\n    <thead><tr><th>Question</th><th>Canonical destination</th></tr></thead>\n    <tbody>\n      <tr><td>What work exists and what is its state?</td><td><code>.agents/tasks/</code></td></tr>\n      <tr><td>Who owns the current mission and how do I resume?</td><td><code>.agents/missions/</code> and <code>.agents/briefs/CURRENT.html</code></td></tr>\n      <tr><td>What is grouped into the current delivery window?</td><td><code>.agents/sprints/</code></td></tr>\n      <tr><td>What happened in an execution attempt?</td><td><code>.agents/runs/</code></td></tr>\n      <tr><td>Which files are reserved and by whom?</td><td><code>.agents/work-claims/</code></td></tr>\n      <tr><td>What was independently verified and landed?</td><td><code>.agents/delivery/</code> and run-local receipts</td></tr>\n      <tr><td>What durable lesson must future agents know?</td><td><code>.agents/memory/</code></td></tr>\n      <tr><td>Where does durable subsystem knowledge live?</td><td><code>docs/domains/</code></td></tr>\n      <tr><td>What stable paths and checks apply?</td><td><code>docs/spine/REPO-FACTS.html</code> and <code>docs/spine/EDIT-MAPS.html</code></td></tr>\n      <tr><td>What decisions are binding?</td><td><code>docs/decisions/</code></td></tr>\n      <tr><td>Where are UI directions, reviews, and proof?</td><td><code>.uihub/campaigns/</code></td></tr>\n      <tr><td>Which capability executes this?</td><td><code>.agents/capabilities/</code>; the project manifest resolves required routes and optional providers</td></tr>\n      <tr><td>What should an agent do next?</td><td><code>project-os onboard --json</code> and <code>.project-os/generated/onboarding.html</code></td></tr>\n    </tbody>\n  </table>\n  <h2>Core commands</h2>\n  <p>Resolve the pinned <code>launcher</code> program and argv from <code>.project-os/project.json</code>.\n    The <code>project-os</code> prefix below is the logical command name, not a global-install assumption.</p>\n  <pre><code>project-os onboard --json\nproject-os doctor --json\nproject-os task claim --by agent-name\nproject-os mission acquire --objective \"Outcome\" --owner agent-name\nproject-os resume create --objective \"Outcome\" --first-read AGENTS.md,PROJECT-OS.html --by agent-name\nproject-os sprint create --title \"Delivery window\" --tasks TASK-0001\nproject-os run create --title \"Implementation attempt\" --task TASK-0001\nproject-os ui create --title \"Surface redesign\" --task TASK-0001\nproject-os build\nproject-os check</code></pre>\n  <h2>Ownership boundary</h2>\n  <p>Project OS owns project-local records, evidence, projections, migration contracts, and integrity gates. Codex CLI or Claude Code executes the core lifecycle directly. Optional providers may add spawning, model routing, messaging, telemetry, and persistent terminal control. Product-specific credentials and automation remain project-local adapters.</p>\n  <p>Do not create parallel task lists, dated status hubs, duplicate engine-local skills, or hand-maintained generated indexes.</p>\n</main>\n<script type=\"application/json\" id=\"project-operating-map-state\">{\"schema_version\":3,\"project_name\":{{PROJECT_NAME_JSON}},\"canonical_task_system\":\".agents/tasks\",\"generated_state\":\".project-os/generated\",\"machine_formats\":[\"json\",\"jsonl\"],\"human_format\":\"html\",\"runtime_boundary\":\"codex-or-claude-cli\",\"orchestration_boundary\":\"optional-provider\",\"adapter_boundary\":\"project-local\"}</script>\n</body>\n</html>\n"
+    },
+    {
+      "path": "docs/archive/INDEX.html",
+      "sha256": "c9f799579d9f522c01dfe18306eea92043b35533ea515ed0a82241d49054c0e4",
+      "templated": false
+    },
+    {
+      "path": "docs/decisions/INDEX.html",
+      "sha256": "454a83fbcb5a530f2394076731956b346ee05ef77bf290535e3b8d7a604a747d",
+      "templated": false
+    },
+    {
+      "path": "docs/domains/INDEX.html",
+      "sha256": "4b18ce35a95a80448a9e01a242dd700cfd2e70d2d5de67a3d3e1837db40ef541",
+      "templated": false
+    },
+    {
+      "path": "docs/ledgers/INDEX.html",
+      "sha256": "331692154e95b455893bc5e406656a2d1ea24f17c2ada3e4568d93c41e496f8b",
+      "templated": false
+    },
+    {
+      "path": "docs/ledgers/decisions.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "templated": false
+    },
+    {
+      "path": "docs/ledgers/proofs.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "templated": false
+    },
+    {
+      "path": "docs/ledgers/runs.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "templated": false
+    },
+    {
+      "path": "docs/project-os/CAPABILITIES.html",
+      "sha256": "5dcdc50d6572dfdd26168ffcc8fb6158d51e95c4fcf94869ccd92a1129c4791e",
+      "templated": false
+    },
+    {
+      "path": "docs/project-os/INDEX.html",
+      "sha256": "1f866595cf9a824b858056e87725db1bd5be8ee77dfe1bf3223c5fab3de1d4c2",
+      "templated": false
+    },
+    {
+      "path": "docs/project-os/ONBOARDING.html",
+      "sha256": "fa1a6d2901fb4b74f11c5979b8c31a7ec77670884d17b2f39a7d5f754a4d00c1",
+      "templated": false
+    },
+    {
+      "path": "docs/proven-recipes/INDEX.html",
+      "sha256": "63920d5fd61d126f987db884d60afe18da168e8d6bb11cec322a17a63dbdc52c",
+      "templated": false
+    },
+    {
+      "path": "docs/research/INDEX.html",
+      "sha256": "cba95e2d26076d6648a5690fe4a463075f4063f77bd34aae791025897e116ba5",
+      "templated": false
+    },
+    {
+      "path": "docs/runs/INDEX.html",
+      "sha256": "517884525738877e3008e99e82bf7d95f5673e89089f4cfc2df768497698bd58",
+      "templated": false
+    },
+    {
+      "path": "docs/spine/EDIT-MAPS.html",
+      "sha256": "f8935fb0747d6709417377f5c06d1c7263914ebb0c4486aa82325c6ece205f94",
+      "templated": false
+    },
+    {
+      "path": "docs/spine/INDEX.html",
+      "sha256": "25799877e4669ad63f24d12ba8275ef4c84c4d75ef542a124a96a380fcfdda59",
+      "templated": false
+    },
+    {
+      "path": "docs/spine/REPO-FACTS.html",
+      "sha256": "612e88ddda3bd672c6edbbc16a297db19603bf8a8d4f14fde5dc598760ab9fe7",
+      "templated": false
+    }
+  ]
+}

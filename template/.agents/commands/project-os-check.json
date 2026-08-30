@@ -5,10 +5,9 @@
   "description": "Validate schemas, references, canonical routes, generated drift, and proof links without repairing authored state.",
   "ownership": "INSTALL",
   "mode": "read-only",
-  "program": "npx",
+  "program": "node",
   "arguments": [
-    "--yes",
-    "github:sisodias/siso-project-os#v0.5.0",
+    ".project-os/project-os-launcher.mjs",
     "check",
     ".",
     "--json"

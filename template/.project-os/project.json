@@ -1,12 +1,27 @@
 {
   "schema_version": 1,
-  "project_os_version": "0.5.0",
+  "project_os_version": "0.5.1",
   "launcher": {
-    "program": "npx",
+    "schema_version": 2,
+    "program": "node",
     "arguments": [
-      "--yes",
-      "github:sisodias/siso-project-os#v0.5.0"
-    ]
+      ".project-os/project-os-launcher.mjs"
+    ],
+    "cwd": "project-root",
+    "source": {
+      "transport": "git",
+      "repository": {{RUNTIME_REPOSITORY_JSON}},
+      "tag": {{RUNTIME_TAG_JSON}},
+      "tag_object": {{RUNTIME_TAG_OBJECT_JSON}},
+      "commit": {{RUNTIME_COMMIT_JSON}},
+      "tree": {{RUNTIME_TREE_JSON}},
+      "bin": "bin/siso-project-os.mjs"
+    },
+    "cache": {
+      "scope": "user",
+      "key": "tag-object",
+      "environment_override": "SISO_PROJECT_OS_CACHE_DIR"
+    }
   },
   "project_name": {{PROJECT_NAME_JSON}},
   "project_summary": {{PROJECT_SUMMARY_JSON}},

@@ -25,13 +25,35 @@
     "launcher": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["program", "arguments"],
+      "required": ["schema_version", "program", "arguments", "cwd", "source", "cache"],
       "properties": {
-        "program": { "const": "npx" },
-        "arguments": {
-          "type": "array",
-          "minItems": 2,
-          "items": { "type": "string", "minLength": 1 }
+        "schema_version": { "const": 2 },
+        "program": { "const": "node" },
+        "arguments": { "const": [".project-os/project-os-launcher.mjs"] },
+        "cwd": { "const": "project-root" },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["transport", "repository", "tag", "tag_object", "commit", "tree", "bin"],
+          "properties": {
+            "transport": { "const": "git" },
+            "repository": { "const": "https://github.com/sisodias/siso-project-os.git" },
+            "tag": { "type": "string", "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+$" },
+            "tag_object": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+            "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+            "tree": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+            "bin": { "const": "bin/siso-project-os.mjs" }
+          }
+        },
+        "cache": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["scope", "key", "environment_override"],
+          "properties": {
+            "scope": { "const": "user" },
+            "key": { "const": "tag-object" },
+            "environment_override": { "const": "SISO_PROJECT_OS_CACHE_DIR" }
+          }
         }
       }
     },

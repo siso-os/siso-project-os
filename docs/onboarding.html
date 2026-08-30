@@ -4,18 +4,37 @@
 <body><main>
   <header data-contract="package-onboarding"><p>Canonical package guide · HTML-first</p><h1>Adopt and operate SISO Project OS</h1><p>Greenfield installation, existing-repository migration, human review, agent cold pickup, and evidence-based handoff.</p></header>
   <section data-contract="ownership"><h2>Three owners, no hidden writers</h2><div class="owners"><div class="owner"><h3>Project OS</h3><p>Canonical project records, schemas, checks, and deterministic projections.</p></div><div class="owner"><h3>Agent CLI</h3><p>Codex CLI, Claude Code, or a compatible runtime reads the loader and executes the core lifecycle.</p></div><div class="owner"><h3>Optional providers and project adapters</h3><p>Fleet orchestration, terminals, product commands, policy, trackers, deployment, browser, and generation edges.</p></div></div></section>
-  <section data-contract="greenfield"><h2>Greenfield</h2><pre>npx --yes github:sisodias/siso-project-os#v0.5.0 init . --name "Project name" \
+  <section data-contract="verified-source"><h2>Verified source checkout</h2><pre>SOURCE_ROOT=$(mktemp -d)
+trap 'rm -rf "$SOURCE_ROOT"' EXIT
+git clone --filter=blob:none --no-checkout https://github.com/sisodias/siso-project-os.git "$SOURCE_ROOT/source"
+git -C "$SOURCE_ROOT/source" fetch --depth=1 origin tag v0.5.1
+PROJECT_OS_TAG_OBJECT=&lt;PM_APPROVED_V0_5_1_TAG_OBJECT&gt;
+PROJECT_OS_COMMIT=&lt;PM_APPROVED_V0_5_1_COMMIT&gt;
+PROJECT_OS_TREE=&lt;PM_APPROVED_V0_5_1_TREE&gt;
+test "$(git -C "$SOURCE_ROOT/source" rev-parse refs/tags/v0.5.1)" = "$PROJECT_OS_TAG_OBJECT"
+test "$(git -C "$SOURCE_ROOT/source" cat-file -t "$PROJECT_OS_TAG_OBJECT")" = tag
+test "$(git -C "$SOURCE_ROOT/source" rev-parse 'refs/tags/v0.5.1^{}')" = "$PROJECT_OS_COMMIT"
+test "$(git -C "$SOURCE_ROOT/source" rev-parse 'refs/tags/v0.5.1^{}^{tree}')" = "$PROJECT_OS_TREE"
+git -C "$SOURCE_ROOT/source" checkout --detach "$PROJECT_OS_COMMIT"
+test -z "$(git -C "$SOURCE_ROOT/source" status --porcelain)"
+project_os() {
+  node "$SOURCE_ROOT/source/bin/siso-project-os.mjs" "$@" \
+    --runtime-repository https://github.com/sisodias/siso-project-os.git \
+    --runtime-tag v0.5.1 --runtime-tag-object "$PROJECT_OS_TAG_OBJECT" \
+    --runtime-commit "$PROJECT_OS_COMMIT" --runtime-tree "$PROJECT_OS_TREE"
+}</pre><p>Use only release-authority object IDs. Verification happens before consumer mutation and persists only public repository metadata and Git IDs; no temporary or private absolute source path is installed.</p></section>
+  <section data-contract="greenfield"><h2>Greenfield</h2><pre>project_os init . --name "Project name" \
   --summary "What this software is" --outcome "The user outcome it must create"
-npx --yes github:sisodias/siso-project-os#v0.5.0 onboard . --json</pre><ol><li>Commit the installed operating structure.</li><li>Verify project configuration, repository facts, and edit maps.</li><li>Use the installed Codex/Claude loaders and declare optional provider routes only when needed.</li><li>Create one observable outcome task.</li><li>Add sprint/run coordination only when the work shape requires it.</li></ol></section>
-  <section data-contract="existing-migration"><h2>Existing repository</h2><pre>npx --yes github:sisodias/siso-project-os#v0.5.0 adopt plan . --name "Project name" --json
-npx --yes github:sisodias/siso-project-os#v0.5.0 adopt apply . --name "Project name" --json
+node .project-os/project-os-launcher.mjs onboard . --json</pre><ol><li>Commit the installed operating structure.</li><li>Verify project configuration, repository facts, and edit maps.</li><li>Use the installed Codex/Claude loaders and declare optional provider routes only when needed.</li><li>Create one observable outcome task.</li><li>Add sprint/run coordination only when the work shape requires it.</li></ol></section>
+  <section data-contract="existing-migration"><h2>Existing repository</h2><pre>project_os adopt plan . --name "Project name" --json
+project_os adopt apply . --name "Project name" --json
 open .project-os/migration/project-kit-migration.html</pre><ol><li>Plan inventories current rules, task authority, docs, capabilities, generated paths, verification, UI artifacts, trackers, archives, and legacy Markdown without mutation.</li><li>Apply creates missing assets, retains identical assets, and preserves every differing authority.</li><li>Existing <code>AGENTS.md</code>/<code>CLAUDE.md</code> retain their bytes and gain one bounded runtime route only when absent.</li><li>Resolve preserved authorities and migrate substantive Markdown through the HTML report.</li><li>Run provider doctor, architecture check, build, and read-only project check.</li><li>Cut over one canonical route at a time; retained external systems use one-way adapters.</li></ol><p>An incomplete migration exits non-zero after safely installing non-conflicting assets. The report names every remaining decision.</p></section>
-  <section data-contract="version-upgrade"><h2>Version upgrade and rollback</h2><pre>npx --yes github:sisodias/siso-project-os#v0.5.0 upgrade plan . --json
-npx --yes github:sisodias/siso-project-os#v0.5.0 upgrade apply . --by agent-name --json
-npx --yes github:sisodias/siso-project-os#v0.5.0 upgrade rollback UPGRADE-... --root . --by agent-name --json</pre><ol><li>Plan is read-only and compares current hashes with the install manifest and checked-in release baselines.</li><li>Apply stops before mutation when a project-authored collision is unresolved.</li><li>Every replacement is backed up under the immutable upgrade record.</li><li>Rollback refuses to overwrite any file changed after the upgrade.</li></ol></section>
+  <section data-contract="version-upgrade"><h2>Version upgrade and rollback</h2><pre>project_os upgrade plan . --json
+project_os upgrade apply . --by agent-name --json
+node .project-os/project-os-launcher.mjs upgrade rollback UPGRADE-... --root . --by agent-name --json</pre><ol><li>Target provenance validates before the read-only plan calculates replacement bytes.</li><li>Plan compares current hashes with the install manifest and checked-in release baselines.</li><li>Apply stops before mutation when configuration, generated commands, the launcher, or another project-authored authority differs.</li><li>Every replacement is backed up under the immutable upgrade record.</li><li>Rollback refuses changed targets or missing backups, restores exact prior bytes, and returns the verified direct-Node route for that prior release.</li></ol></section>
   <section data-contract="agent-cold-pickup"><h2>Agent cold pickup</h2><ol><li>Codex CLI reads root and nearest <code>AGENTS.md</code>; Claude Code reads <code>CLAUDE.md</code> and the routed root rules.</li><li>Read <code>PROJECT-OS.html</code>.</li><li>Run read-only onboarding and stop on integrity errors.</li><li>Open one canonical task and linked execution context.</li><li>Search repo facts, edit maps, docs, decisions, proof, runs, research dead ends, and memory.</li><li>Choose a declared capability; the current CLI actuates and Project OS records. Use optional providers only for added orchestration.</li><li>Teach back outcome, task, write fence, dependencies, human gates, verification, and return.</li><li>Claim, execute, prove, classify, rebuild, check, and hand off.</li></ol></section>
   <section data-contract="human-path"><h2>Human path</h2><p>Open the generated cockpit, address explicit human gates, blockers, and UI reviews, then record the answer in the owning canonical record. Never edit generated HTML.</p></section>
   <section data-contract="ui-review"><h2>UI decision path</h2><p>Candidate manifest → deterministic gallery/review → downloaded response → exhaustive decision → chosen-direction implementation → same-commit verification → task-evidence fold. Verification does not close the task.</p></section>
-  <section data-contract="handoff"><h2>Handoff</h2><pre>project-os build
-project-os check --json</pre><ol><li>Update task/run truth.</li><li>Attach commands, revision, and observation evidence.</li><li>Classify durable outputs.</li><li>Report PASS, FAIL, BLOCKED, and not-observed honestly.</li><li>Name the next canonical record.</li></ol></section>
-</main><script id="package-onboarding-contract" type="application/json">{"schema_version":1,"kind":"package-onboarding","format":"html-first","contracts":["ownership","greenfield","existing-migration","version-upgrade","agent-cold-pickup","human-path","ui-review","handoff"],"generated_writer":false}</script></body></html>
+  <section data-contract="handoff"><h2>Handoff</h2><pre>node .project-os/project-os-launcher.mjs build .
+node .project-os/project-os-launcher.mjs check . --json</pre><ol><li>Update task/run truth.</li><li>Attach commands, revision, and observation evidence.</li><li>Classify durable outputs.</li><li>Report PASS, FAIL, BLOCKED, and not-observed honestly.</li><li>Name the next canonical record.</li></ol></section>
+</main><script id="package-onboarding-contract" type="application/json">{"schema_version":1,"kind":"package-onboarding","format":"html-first","contracts":["ownership","verified-source","greenfield","existing-migration","version-upgrade","agent-cold-pickup","human-path","ui-review","handoff"],"generated_writer":false}</script></body></html>

@@ -9,8 +9,8 @@ import { fileURLToPath } from 'node:url'
 
 const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 
-function run(program, args, cwd, expected = 0) {
-  const result = spawnSync(program, args, { cwd, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 })
+function run(program, args, cwd, expected = 0, env = process.env) {
+  const result = spawnSync(program, args, { cwd, env, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 })
   assert.equal(result.status, expected, `${program} ${args.join(' ')} exited ${result.status}\nstdout:\n${result.stdout}\nstderr:\n${result.stderr}`)
   return result
 }
@@ -20,6 +20,7 @@ try {
   const packageDirectory = join(proofRoot, 'package')
   const consumerDirectory = join(proofRoot, 'consumer')
   const projectDirectory = join(consumerDirectory, 'project')
+  const launcherCache = join(proofRoot, 'runtime-cache')
   await mkdir(packageDirectory, { recursive: true })
   await mkdir(consumerDirectory, { recursive: true })
   await writeFile(join(consumerDirectory, 'package.json'), '{"private":true}\n', 'utf8')
@@ -31,18 +32,46 @@ try {
   const installedPackageRoot = join(consumerDirectory, 'node_modules', '@siso', 'project-os')
   const installedPackage = JSON.parse(await readFile(join(installedPackageRoot, 'package.json'), 'utf8'))
   const bin = join(installedPackageRoot, 'bin', 'siso-project-os.mjs')
-  run(process.execPath, [bin, 'init', projectDirectory, '--name', 'Packed restore proof'], consumerDirectory)
+  run('git', ['init', '-b', 'main'], installedPackageRoot)
+  run('git', ['config', 'user.name', 'Packed restore proof'], installedPackageRoot)
+  run('git', ['config', 'user.email', 'packed-restore@example.invalid'], installedPackageRoot)
+  run('git', ['remote', 'add', 'origin', 'https://github.com/sisodias/siso-project-os.git'], installedPackageRoot)
+  run('git', ['add', '.'], installedPackageRoot)
+  run('git', ['commit', '-m', 'Create synthetic packed v0.5.1 release'], installedPackageRoot)
+  run('git', ['tag', '-a', 'v0.5.1', '-m', 'Synthetic packed v0.5.1'], installedPackageRoot)
+  const tagObject = run('git', ['rev-parse', 'refs/tags/v0.5.1'], installedPackageRoot).stdout.trim()
+  const commit = run('git', ['rev-parse', 'refs/tags/v0.5.1^{}'], installedPackageRoot).stdout.trim()
+  const tree = run('git', ['rev-parse', 'refs/tags/v0.5.1^{}^{tree}'], installedPackageRoot).stdout.trim()
+  run('git', ['checkout', '--detach', commit], installedPackageRoot)
+  const provenance = [
+    '--runtime-repository', 'https://github.com/sisodias/siso-project-os.git',
+    '--runtime-tag', 'v0.5.1',
+    '--runtime-tag-object', tagObject,
+    '--runtime-commit', commit,
+    '--runtime-tree', tree,
+  ]
+  run(process.execPath, [bin, 'init', projectDirectory, '--name', 'Packed restore proof', ...provenance], consumerDirectory)
 
   const bootstrapPath = join(projectDirectory, 'fleet.bootstrap.json')
   await writeFile(bootstrapPath, await readFile(join(installedPackageRoot, 'packs', 'fleet', 'fleet.bootstrap.example.json'), 'utf8'))
-  const plan = JSON.parse(run(process.execPath, [bin, 'fleet', 'plan', projectDirectory, '--config', bootstrapPath, '--json'], consumerDirectory).stdout)
-  const installed = JSON.parse(run(process.execPath, [bin, 'fleet', 'init', projectDirectory, '--config', bootstrapPath, '--json'], consumerDirectory).stdout)
-  const repeated = JSON.parse(run(process.execPath, [bin, 'fleet', 'init', projectDirectory, '--config', bootstrapPath, '--json'], consumerDirectory).stdout)
-  const fleetCheck = JSON.parse(run(process.execPath, [bin, 'fleet', 'check', projectDirectory, '--json'], consumerDirectory).stdout)
-  const projectCheck = JSON.parse(run(process.execPath, [bin, 'check', projectDirectory, '--json'], consumerDirectory).stdout)
+  const launcher = join(projectDirectory, '.project-os', 'project-os-launcher.mjs')
+  const launcherEnvironment = {
+    ...process.env,
+    SISO_PROJECT_OS_CACHE_DIR: launcherCache,
+    GIT_CONFIG_COUNT: '1',
+    GIT_CONFIG_KEY_0: `url.file://${installedPackageRoot}/.insteadOf`,
+    GIT_CONFIG_VALUE_0: 'https://github.com/sisodias/siso-project-os.git',
+  }
+  const managed = (args) => run(process.execPath, [launcher, ...args], projectDirectory, 0, launcherEnvironment)
+  const plan = JSON.parse(managed(['fleet', 'plan', '.', '--config', 'fleet.bootstrap.json', '--json']).stdout)
+  const installed = JSON.parse(managed(['fleet', 'init', '.', '--config', 'fleet.bootstrap.json', '--json']).stdout)
+  const repeated = JSON.parse(managed(['fleet', 'init', '.', '--config', 'fleet.bootstrap.json', '--json']).stdout)
+  const fleetCheck = JSON.parse(managed(['fleet', 'check', '.', '--json']).stdout)
+  const projectCheck = JSON.parse(managed(['check', '.', '--json']).stdout)
   const manifest = JSON.parse(await readFile(join(projectDirectory, '.agents', 'fleet', 'PACK.json'), 'utf8'))
+  const projectConfiguration = JSON.parse(await readFile(join(projectDirectory, '.project-os', 'project.json'), 'utf8'))
 
-  assert.equal(installedPackage.version, '0.5.0')
+  assert.equal(installedPackage.version, '0.5.1')
   assert.equal(plan.ok, true)
   assert.equal(plan.summary.collision, 0)
   assert.equal(installed.ok, true)
@@ -51,6 +80,9 @@ try {
   assert.equal(fleetCheck.ok, true)
   assert.equal(projectCheck.ok, true)
   assert.equal(manifest.pack_version, '1.0.0')
+  assert.equal(projectConfiguration.launcher.program, 'node')
+  assert.equal(projectConfiguration.launcher.source.tag_object, tagObject)
+  assert.equal(JSON.stringify(projectConfiguration).includes(proofRoot), false)
 
   process.stdout.write(`${JSON.stringify({
     schema_version: 1,
@@ -63,6 +95,8 @@ try {
       entry_count: packed.entryCount,
     },
     install: {
+      acquisition: 'verified synthetic annotated Git source plus direct Node bin',
+      persisted_launcher: 'node .project-os/project-os-launcher.mjs',
       plan_ok: plan.ok,
       collisions: plan.summary.collision,
       pack_version: manifest.pack_version,

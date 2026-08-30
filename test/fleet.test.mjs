@@ -5,6 +5,7 @@ import { dirname, join, resolve } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import test from 'node:test'
 import { fileURLToPath } from 'node:url'
+import { applyProjectAdoption } from '../src/adoption.mjs'
 import {
   admitFleet,
   evaluateFleetAdmission,
@@ -15,6 +16,15 @@ import {
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const bin = join(repositoryRoot, 'bin', 'siso-project-os.mjs')
 let claimSequence = 0
+const RUNTIME_SOURCE = Object.freeze({
+  transport: 'git',
+  repository: 'https://github.com/sisodias/siso-project-os.git',
+  tag: 'v0.5.1',
+  tag_object: '1'.repeat(40),
+  commit: '2'.repeat(40),
+  tree: '3'.repeat(40),
+  bin: 'bin/siso-project-os.mjs',
+})
 
 function run(args, expected = 0) {
   const result = spawnSync(process.execPath, [bin, ...args], { encoding: 'utf8' })
@@ -37,7 +47,9 @@ async function commitAll(root, message) {
 async function project(t) {
   const root = await mkdtemp(join(tmpdir(), 'siso-fleet-test-'))
   t.after(() => rm(root, { recursive: true, force: true }))
-  run(['init', root, '--name', 'Fleet fixture'])
+  await applyProjectAdoption(root, { name: 'Fleet fixture', runtimeSource: RUNTIME_SOURCE })
+  run(['build', root])
+  run(['architecture', 'baseline', root, '--by', 'fleet-test'])
   git(root, ['init', '-b', 'main'])
   git(root, ['config', 'user.name', 'Fleet test'])
   git(root, ['config', 'user.email', 'fleet-test@example.invalid'])
@@ -321,6 +333,7 @@ test('fleet fails closed on old, invalid, or missing installed Project OS versio
   const root = await project(t)
   const projectPath = join(root, '.project-os/project.json')
   const configuration = JSON.parse(await readFile(projectPath, 'utf8'))
+  assert.equal(configuration.project_os_version, '0.5.1')
   configuration.project_os_version = '0.4.0'
   await writeFile(projectPath, `${JSON.stringify(configuration, null, 2)}\n`, 'utf8')
   assert.ok((await planFleetInstall(root, bootstrap())).errors.some((entry) => entry.code === 'fleet_project_os_incompatible'))

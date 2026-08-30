@@ -1,24 +1,81 @@
 #!/usr/bin/env node
 
-import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { cp, mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join, relative, resolve } from 'node:path'
 import { spawnSync } from 'node:child_process'
+import { fileURLToPath } from 'node:url'
 
+const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const root = await mkdtemp(join(tmpdir(), 'siso-project-os-smoke-'))
 const existingRoot = await mkdtemp(join(tmpdir(), 'siso-project-os-existing-smoke-'))
 const providerRoot = await mkdtemp(join(tmpdir(), 'siso-agent-base-provider-smoke-'))
-const bin = join(new URL('..', import.meta.url).pathname, 'bin', 'siso-project-os.mjs')
+const releaseRoot = await mkdtemp(join(tmpdir(), 'siso-project-os-release-smoke-'))
+const launcherCache = await mkdtemp(join(tmpdir(), 'siso-project-os-cache-smoke-'))
+const sourceRoot = join(releaseRoot, 'source')
+const repository = 'https://github.com/sisodias/siso-project-os.git'
+let bin
+let provenance = []
+
+function gitAt(cwd, args) {
+  const result = spawnSync('git', args, { cwd, encoding: 'utf8' })
+  if (result.status !== 0) throw new Error(`git ${args.join(' ')} failed:\n${result.stdout}\n${result.stderr}`)
+  return result.stdout.trim()
+}
 
 function run(args, expected = 0) {
-  const result = spawnSync(process.execPath, [bin, ...args], { encoding: 'utf8' })
+  const requiresProvenance = args[0] === 'init' || args[0] === 'adopt' || (args[0] === 'upgrade' && args[1] !== 'rollback')
+  const result = spawnSync(process.execPath, [bin, ...args, ...(requiresProvenance ? provenance : [])], { encoding: 'utf8' })
   if (result.status !== expected) {
     throw new Error(`command failed (${result.status}): ${args.join(' ')}\n${result.stdout}\n${result.stderr}`)
   }
   return result
 }
 
+function runManaged(args, expected = 0, cwd = providerRoot) {
+  const result = spawnSync(process.execPath, [join(root, '.project-os', 'project-os-launcher.mjs'), ...args], {
+    cwd,
+    encoding: 'utf8',
+    env: {
+      ...process.env,
+      SISO_PROJECT_OS_CACHE_DIR: launcherCache,
+      GIT_CONFIG_COUNT: '1',
+      GIT_CONFIG_KEY_0: `url.file://${sourceRoot}/.insteadOf`,
+      GIT_CONFIG_VALUE_0: repository,
+    },
+  })
+  if (result.status !== expected) throw new Error(`managed command failed (${result.status}): ${args.join(' ')}\n${result.stdout}\n${result.stderr}`)
+  return result
+}
+
 try {
+  await cp(packageRoot, sourceRoot, {
+    recursive: true,
+    filter: (source) => {
+      const pointer = relative(packageRoot, source)
+      return pointer !== '.git' && !pointer.startsWith(`.git${process.platform === 'win32' ? '\\' : '/'}`)
+    },
+  })
+  gitAt(sourceRoot, ['init', '-b', 'main'])
+  gitAt(sourceRoot, ['config', 'user.name', 'Project OS smoke'])
+  gitAt(sourceRoot, ['config', 'user.email', 'project-os-smoke@example.invalid'])
+  gitAt(sourceRoot, ['remote', 'add', 'origin', repository])
+  gitAt(sourceRoot, ['add', '.'])
+  gitAt(sourceRoot, ['commit', '-m', 'Create synthetic v0.5.1 release'])
+  gitAt(sourceRoot, ['tag', '-a', 'v0.5.1', '-m', 'Synthetic v0.5.1'])
+  const tagObject = gitAt(sourceRoot, ['rev-parse', 'refs/tags/v0.5.1'])
+  const commit = gitAt(sourceRoot, ['rev-parse', 'refs/tags/v0.5.1^{}'])
+  const tree = gitAt(sourceRoot, ['rev-parse', 'refs/tags/v0.5.1^{}^{tree}'])
+  gitAt(sourceRoot, ['checkout', '--detach', commit])
+  provenance = [
+    '--runtime-repository', repository,
+    '--runtime-tag', 'v0.5.1',
+    '--runtime-tag-object', tagObject,
+    '--runtime-commit', commit,
+    '--runtime-tree', tree,
+  ]
+  bin = join(sourceRoot, 'bin', 'siso-project-os.mjs')
+
   for (const skill of ['subagents', 'conduct', 'orchestrate', 'herdr', 'agent-comms']) {
     const directory = join(providerRoot, 'templates', 'profile', 'skills', skill)
     await mkdir(directory, { recursive: true })
@@ -26,12 +83,12 @@ try {
   }
   run(['init', root, '--name', 'Smoke Project'])
   const configuration = JSON.parse(await readFile(join(root, '.project-os', 'project.json'), 'utf8'))
-  if (configuration.project_os_version !== '0.5.0') throw new Error(`unexpected Project OS version: ${configuration.project_os_version}`)
-  if (JSON.stringify(configuration.launcher) !== JSON.stringify({ program: 'npx', arguments: ['--yes', 'github:sisodias/siso-project-os#v0.5.0'] })) {
+  if (configuration.project_os_version !== '0.5.1') throw new Error(`unexpected Project OS version: ${configuration.project_os_version}`)
+  if (configuration.launcher.program !== 'node' || configuration.launcher.source.tag_object !== tagObject || configuration.launcher.source.commit !== commit || configuration.launcher.source.tree !== tree) {
     throw new Error(`unexpected pinned launcher: ${JSON.stringify(configuration.launcher)}`)
   }
   const installManifest = JSON.parse(await readFile(join(root, '.project-os', 'install-manifest.json'), 'utf8'))
-  if (installManifest.installed_version !== '0.5.0' || installManifest.files.length < 100) {
+  if (installManifest.installed_version !== '0.5.1' || installManifest.files.length < 100) {
     throw new Error(`install manifest incomplete: ${JSON.stringify(installManifest)}`)
   }
   const portableDoctor = JSON.parse(run(['doctor', root, '--json']).stdout)
@@ -67,6 +124,9 @@ try {
   if (!onboarded.ok || onboarded.guide !== '.project-os/generated/onboarding.html') {
     throw new Error(`unexpected onboarding report: ${JSON.stringify(onboarded)}`)
   }
+  const managedCheck = JSON.parse(runManaged(['check', '.', '--json']).stdout)
+  const managedOnboard = JSON.parse(runManaged(['onboard', '.', '--json']).stdout)
+  if (!managedCheck.ok || !managedOnboard.ok) throw new Error('managed launcher check or onboard failed')
   const index = JSON.parse(await readFile(join(root, '.project-os', 'generated', 'project-index.json'), 'utf8'))
   if (index.counts.tasks !== 1 || index.counts.sprints !== 1 || index.counts.runs !== 1 || index.counts.campaigns !== 1) {
     throw new Error(`unexpected smoke counts: ${JSON.stringify(index.counts)}`)
@@ -92,4 +152,6 @@ try {
   await rm(root, { recursive: true, force: true })
   await rm(existingRoot, { recursive: true, force: true })
   await rm(providerRoot, { recursive: true, force: true })
+  await rm(releaseRoot, { recursive: true, force: true })
+  await rm(launcherCache, { recursive: true, force: true })
 }

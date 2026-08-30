@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 import { cp, mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
-import { dirname, join, resolve } from 'node:path'
+import { dirname, join, relative, resolve } from 'node:path'
 import { spawn, spawnSync } from 'node:child_process'
 import test from 'node:test'
 import { fileURLToPath } from 'node:url'
@@ -10,17 +10,59 @@ import { renderOnboardingHtml } from '../src/console.mjs'
 import { walkFiles } from '../src/shared.mjs'
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const bin = join(repoRoot, 'bin', 'siso-project-os.mjs')
+const releaseRoot = await mkdtemp(join(tmpdir(), 'siso-project-os-cli-release-'))
+const sourceRoot = join(releaseRoot, 'source')
+const repository = 'https://github.com/sisodias/siso-project-os.git'
 
-function run(args, expected = 0) {
-  const result = spawnSync(process.execPath, [bin, ...args], { encoding: 'utf8' })
+function gitAt(cwd, args) {
+  const result = spawnSync('git', args, { cwd, encoding: 'utf8' })
+  assert.equal(result.status, 0, `git ${args.join(' ')} failed:\n${result.stdout}\n${result.stderr}`)
+  return result.stdout.trim()
+}
+
+await cp(repoRoot, sourceRoot, {
+  recursive: true,
+  filter: (source) => {
+    const pointer = relative(repoRoot, source)
+    return pointer !== '.git' && !pointer.startsWith('.git/') && !pointer.startsWith('.git\\')
+  },
+})
+gitAt(sourceRoot, ['init', '-b', 'main'])
+gitAt(sourceRoot, ['config', 'user.name', 'Project OS CLI test'])
+gitAt(sourceRoot, ['config', 'user.email', 'project-os-cli@example.invalid'])
+gitAt(sourceRoot, ['remote', 'add', 'origin', repository])
+gitAt(sourceRoot, ['add', '.'])
+gitAt(sourceRoot, ['commit', '-m', 'Create synthetic v0.5.1 release'])
+gitAt(sourceRoot, ['tag', '-a', 'v0.5.1', '-m', 'Synthetic v0.5.1'])
+const tagObject = gitAt(sourceRoot, ['rev-parse', 'refs/tags/v0.5.1'])
+const commit = gitAt(sourceRoot, ['rev-parse', 'refs/tags/v0.5.1^{}'])
+const tree = gitAt(sourceRoot, ['rev-parse', 'refs/tags/v0.5.1^{}^{tree}'])
+gitAt(sourceRoot, ['checkout', '--detach', commit])
+const bin = join(sourceRoot, 'bin', 'siso-project-os.mjs')
+const provenance = [
+  '--runtime-repository', repository,
+  '--runtime-tag', 'v0.5.1',
+  '--runtime-tag-object', tagObject,
+  '--runtime-commit', commit,
+  '--runtime-tree', tree,
+]
+
+test.after(() => rm(releaseRoot, { recursive: true, force: true }))
+
+function commandArgs(args, includeProvenance = true) {
+  const requiresProvenance = args[0] === 'init' || args[0] === 'adopt' || (args[0] === 'upgrade' && args[1] !== 'rollback')
+  return [...args, ...(requiresProvenance && includeProvenance ? provenance : [])]
+}
+
+function run(args, expected = 0, options = {}) {
+  const result = spawnSync(process.execPath, [bin, ...commandArgs(args, options.provenance !== false)], { encoding: 'utf8' })
   assert.equal(result.status, expected, `unexpected exit for ${args.join(' ')}\nstdout:\n${result.stdout}\nstderr:\n${result.stderr}`)
   return result
 }
 
-function runAsync(args) {
+function runAsync(args, options = {}) {
   return new Promise((resolveRun, reject) => {
-    const child = spawn(process.execPath, [bin, ...args], { encoding: 'utf8' })
+    const child = spawn(process.execPath, [bin, ...commandArgs(args, options.provenance !== false)], { encoding: 'utf8' })
     let stdout = ''
     let stderr = ''
     child.stdout.on('data', (chunk) => { stdout += chunk })
@@ -124,7 +166,9 @@ test('onboard is read-only and projects human attention separately from unblocke
     await readFile(join(root, 'docs', 'project-os', 'ONBOARDING.html'), 'utf8'),
     onboarding,
   ]) {
-    const normalized = source.replace(/\s+/g, ' ')
+    const normalized = source
+      .replace('node .project-os/project-os-launcher.mjs onboard . --json', 'project-os onboard --json')
+      .replace(/\s+/g, ' ')
     let previous = -1
     for (const token of orderedTokens) {
       const index = normalized.indexOf(token)
@@ -168,6 +212,24 @@ test('init refuses ordinary collisions without leaving a partial install', async
   await writeFile(join(root, 'PROJECT-OS.html'), 'existing\n', 'utf8')
   run(['init', root], 2)
   await assert.rejects(readFile(join(root, '.project-os', 'project.json'), 'utf8'))
+})
+
+test('init rejects missing or partial runtime provenance before target mutation', async (t) => {
+  const missingRoot = await mkdtemp(join(tmpdir(), 'siso-project-os-missing-provenance-'))
+  const partialRoot = await mkdtemp(join(tmpdir(), 'siso-project-os-partial-provenance-'))
+  t.after(() => rm(missingRoot, { recursive: true, force: true }))
+  t.after(() => rm(partialRoot, { recursive: true, force: true }))
+
+  const missing = run(['init', missingRoot, '--name', 'Missing provenance'], 1, { provenance: false })
+  assert.match(missing.stderr, /complete runtime provenance is required/)
+  await assert.rejects(readFile(join(missingRoot, '.project-os', 'project.json'), 'utf8'))
+
+  const partial = run([
+    'init', partialRoot, '--name', 'Partial provenance',
+    '--runtime-repository', repository,
+  ], 1, { provenance: false })
+  assert.match(partial.stderr, /missing tag, tag_object, commit, tree/)
+  await assert.rejects(readFile(join(partialRoot, '.project-os', 'project.json'), 'utf8'))
 })
 
 test('init preserves existing AGENTS.md and stages the merge contract', async (t) => {

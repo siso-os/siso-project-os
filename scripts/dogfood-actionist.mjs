@@ -1,21 +1,43 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict'
-import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { copyFile, cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
-import { dirname, join, resolve } from 'node:path'
+import { dirname, join, relative, resolve } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { admitFleet } from '../src/fleet.mjs'
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const exampleRoot = join(repositoryRoot, 'examples', 'actionist-fleet')
-const bin = join(repositoryRoot, 'bin', 'siso-project-os.mjs')
 const root = await mkdtemp(join(tmpdir(), 'siso-actionist-dogfood-'))
+const releaseRoot = await mkdtemp(join(tmpdir(), 'siso-actionist-release-'))
+const launcherCache = await mkdtemp(join(tmpdir(), 'siso-actionist-cache-'))
+const sourceRoot = join(releaseRoot, 'source')
+const repository = 'https://github.com/sisodias/siso-project-os.git'
+let bin
+let provenance = []
 
 function run(args, expected = 0) {
-  const result = spawnSync(process.execPath, [bin, ...args], { encoding: 'utf8' })
+  const requiresProvenance = args[0] === 'init' || args[0] === 'adopt' || (args[0] === 'upgrade' && args[1] !== 'rollback')
+  const result = spawnSync(process.execPath, [bin, ...args, ...(requiresProvenance ? provenance : [])], { encoding: 'utf8' })
   if (result.status !== expected) throw new Error(`command failed (${result.status}): ${args.join(' ')}\n${result.stdout}\n${result.stderr}`)
+  return result
+}
+
+function runManaged(args, expected = 0) {
+  const result = spawnSync(process.execPath, [join(root, '.project-os', 'project-os-launcher.mjs'), ...args], {
+    cwd: exampleRoot,
+    encoding: 'utf8',
+    env: {
+      ...process.env,
+      SISO_PROJECT_OS_CACHE_DIR: launcherCache,
+      GIT_CONFIG_COUNT: '1',
+      GIT_CONFIG_KEY_0: `url.file://${sourceRoot}/.insteadOf`,
+      GIT_CONFIG_VALUE_0: repository,
+    },
+  })
+  if (result.status !== expected) throw new Error(`managed command failed (${result.status}): ${args.join(' ')}\n${result.stdout}\n${result.stderr}`)
   return result
 }
 
@@ -34,9 +56,37 @@ async function jsonFile(path) {
 }
 
 try {
+  await cp(repositoryRoot, sourceRoot, {
+    recursive: true,
+    filter: (sourcePath) => {
+      const pointer = relative(repositoryRoot, sourcePath)
+      return pointer !== '.git' && !pointer.startsWith('.git/') && !pointer.startsWith('.git\\')
+    },
+  })
+  gitAt(sourceRoot, ['init', '-b', 'main'])
+  gitAt(sourceRoot, ['config', 'user.name', 'Project OS Actionist dog-food'])
+  gitAt(sourceRoot, ['config', 'user.email', 'project-os-actionist@example.invalid'])
+  gitAt(sourceRoot, ['remote', 'add', 'origin', repository])
+  gitAt(sourceRoot, ['add', '.'])
+  gitAt(sourceRoot, ['commit', '-m', 'Create synthetic v0.5.1 release'])
+  gitAt(sourceRoot, ['tag', '-a', 'v0.5.1', '-m', 'Synthetic v0.5.1'])
+  const tagObject = gitAt(sourceRoot, ['rev-parse', 'refs/tags/v0.5.1'])
+  const commit = gitAt(sourceRoot, ['rev-parse', 'refs/tags/v0.5.1^{}'])
+  const tree = gitAt(sourceRoot, ['rev-parse', 'refs/tags/v0.5.1^{}^{tree}'])
+  gitAt(sourceRoot, ['checkout', '--detach', commit])
+  provenance = [
+    '--runtime-repository', repository,
+    '--runtime-tag', 'v0.5.1',
+    '--runtime-tag-object', tagObject,
+    '--runtime-commit', commit,
+    '--runtime-tree', tree,
+  ]
+  bin = join(sourceRoot, 'bin', 'siso-project-os.mjs')
+
   const source = await jsonFile(join(exampleRoot, 'source-snapshot.json'))
   const configPath = join(exampleRoot, 'fleet.bootstrap.json')
   run(['init', root, '--name', 'Actionist fleet dog-food', '--summary', 'Non-authoritative migration rehearsal.', '--outcome', 'Prove portable fleet gates without mutating live Actionist state.'])
+  const projectConfiguration = await jsonFile(join(root, '.project-os', 'project.json'))
   const actionistRoot = join(root, 'actionist-base')
   await mkdir(actionistRoot, { recursive: true })
   await writeFile(join(actionistRoot, 'README.md'), '# Public-safe Actionist base fixture\n', 'utf8')
@@ -46,12 +96,12 @@ try {
   gitAt(actionistRoot, ['add', '.'])
   gitAt(actionistRoot, ['commit', '-m', 'Create nested Actionist base fixture'])
   await writeFile(join(root, '.gitignore'), 'actionist-base/\n', 'utf8')
-  const plan = JSON.parse(run(['fleet', 'plan', root, '--config', configPath, '--json']).stdout)
-  const install = JSON.parse(run(['fleet', 'init', root, '--config', configPath, '--json']).stdout)
+  const plan = JSON.parse(runManaged(['fleet', 'plan', root, '--config', configPath, '--json']).stdout)
+  const install = JSON.parse(runManaged(['fleet', 'init', root, '--config', configPath, '--json']).stdout)
 
-  const qualification = JSON.parse(run(['task', 'create', '--root', root, '--title', 'Qualify the synthetic Actionist source fixture', '--domain', 'qualification', '--owner', 'ACTIONIST-PM', '--json']).stdout)
-  const materialization = JSON.parse(run(['task', 'create', '--root', root, '--title', 'Materialize the canonical Mini runtime', '--domain', 'programme', '--json']).stdout)
-  const conversion = JSON.parse(run(['task', 'create', '--root', root, '--title', 'Admit the first bounded conversion', '--domain', 'foundry', '--deps', `${qualification.id},${materialization.id}`, '--json']).stdout)
+  const qualification = JSON.parse(runManaged(['task', 'create', '--root', root, '--title', 'Qualify the synthetic Actionist source fixture', '--domain', 'qualification', '--owner', 'ACTIONIST-PM', '--json']).stdout)
+  const materialization = JSON.parse(runManaged(['task', 'create', '--root', root, '--title', 'Materialize the canonical Mini runtime', '--domain', 'programme', '--json']).stdout)
+  const conversion = JSON.parse(runManaged(['task', 'create', '--root', root, '--title', 'Admit the first bounded conversion', '--domain', 'foundry', '--deps', `${qualification.id},${materialization.id}`, '--json']).stdout)
   assert.deepEqual([qualification.id, materialization.id, conversion.id], ['TASK-0001', 'TASK-0002', 'TASK-0003'])
 
   const qualificationEvidence = join(root, '.agents/fleet/evidence/qualification/TASK-0001')
@@ -79,16 +129,16 @@ try {
 
   const conversionInput = await jsonFile(join(exampleRoot, 'admission.conversion.json'))
   conversionInput.candidate.candidate_sha = gitAt(actionistRoot, ['rev-parse', 'HEAD'])
-  const conversionRun = JSON.parse(run([
+  const conversionRun = JSON.parse(runManaged([
     'run', 'create', '--root', root, '--title', 'Actionist conversion rehearsal',
     '--task', conversion.id, '--date', '2026-08-30', '--json',
   ]).stdout)
-  run([
+  runManaged([
     'run', 'unit-add', conversionRun.id, '--root', root, '--id', 'conversion-unit',
     '--tasks', conversion.id, '--paths', conversionInput.candidate.write_paths.join(','),
     '--by', conversionInput.candidate.actor, '--json',
   ])
-  const conversionClaim = JSON.parse(run([
+  const conversionClaim = JSON.parse(runManaged([
     'claim', 'acquire', '--root', root, '--id', 'CLAIM-ACTIONIST-CONVERSION',
     '--task', conversion.id, '--run', conversionRun.id, '--unit', 'conversion-unit',
     '--paths', conversionInput.candidate.write_paths.join(','),
@@ -102,9 +152,9 @@ try {
   assert.ok(conversionReceipt.reason_codes.includes('dependency_blocked'))
   assert.ok(conversionReceipt.reason_codes.includes('verifier_backlog'))
 
-  run(['build', root])
-  const fleetCheck = JSON.parse(run(['fleet', 'check', root, '--json']).stdout)
-  const projectCheck = JSON.parse(run(['check', root, '--json']).stdout)
+  runManaged(['build', root])
+  const fleetCheck = JSON.parse(runManaged(['fleet', 'check', root, '--json']).stdout)
+  const projectCheck = JSON.parse(runManaged(['check', root, '--json']).stdout)
   const taskGraph = await jsonFile(join(root, '.agents/fleet/generated/TASK-GRAPH.json'))
   const teamState = await jsonFile(join(root, '.agents/fleet/generated/TEAM-STATE.json'))
 
@@ -126,6 +176,11 @@ try {
       pack_id: install.pack_id,
       pack_version: install.pack_version,
       installed_files: install.installed.length,
+      launcher_program: projectConfiguration.launcher.program,
+      launcher_tag: projectConfiguration.launcher.source.tag,
+      launcher_commit: projectConfiguration.launcher.source.commit,
+      launcher_tree: projectConfiguration.launcher.source.tree,
+      launcher_cold_and_warm_cache_verified: true,
     },
     admission_receipts: [
       { id: qualifierReceipt.id, verdict: qualifierReceipt.verdict, reason_codes: qualifierReceipt.reason_codes },
@@ -159,4 +214,6 @@ try {
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`)
 } finally {
   await rm(root, { recursive: true, force: true })
+  await rm(releaseRoot, { recursive: true, force: true })
+  await rm(launcherCache, { recursive: true, force: true })
 }

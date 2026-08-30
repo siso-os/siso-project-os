@@ -1,6 +1,8 @@
 import { createHash } from 'node:crypto'
-import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises'
+import { execFile } from 'node:child_process'
+import { lstat, mkdir, readFile, unlink, writeFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
+import { promisify } from 'node:util'
 import {
   isoNow,
   packageRoot,
@@ -18,6 +20,20 @@ import { PROJECT_OS_VERSION } from './version.mjs'
 export { PROJECT_OS_VERSION }
 const INSTALL_MANIFEST_PATH = '.project-os/install-manifest.json'
 const PROTECTED_RUNTIME_SHIMS = new Set(['AGENTS.md', 'CLAUDE.md'])
+const RUNTIME_REPOSITORY = 'https://github.com/sisodias/siso-project-os.git'
+const RUNTIME_BIN = 'bin/siso-project-os.mjs'
+const GIT_OBJECT_ID = /^[0-9a-f]{40}$/
+const VERIFIED_RUNTIME_SOURCE = Symbol('verified-runtime-source')
+const execute = promisify(execFile)
+const V0_5_0_SOURCE = Object.freeze({
+  transport: 'git',
+  repository: RUNTIME_REPOSITORY,
+  tag: 'v0.5.0',
+  tag_object: '6a1db28c537dd1537c8b83f0a8fe7780a11989c8',
+  commit: 'f19387fe8b481a2e976fc19277909071151dc7c6',
+  tree: 'e02b2c21a2894c63f4a75a6fcda43de7928d0d98',
+  bin: RUNTIME_BIN,
+})
 
 function digest(content) {
   return createHash('sha256').update(content).digest('hex')
@@ -29,6 +45,122 @@ function htmlEscape(value) {
 
 function embeddedJson(value) {
   return JSON.stringify(value).replaceAll('<', '\\u003c')
+}
+
+function runtimeSourceInput(input = {}) {
+  if (input.runtimeSource && typeof input.runtimeSource === 'object') return input.runtimeSource
+  return {
+    transport: 'git',
+    repository: input['runtime-repository'],
+    tag: input['runtime-tag'],
+    tag_object: input['runtime-tag-object'],
+    commit: input['runtime-commit'],
+    tree: input['runtime-tree'],
+    bin: RUNTIME_BIN,
+  }
+}
+
+export function normalizeRuntimeSource(input = {}) {
+  const candidate = runtimeSourceInput(input)
+  const required = ['repository', 'tag', 'tag_object', 'commit', 'tree']
+  const missing = required.filter((key) => typeof candidate[key] !== 'string' || candidate[key].trim() === '')
+  if (missing.length > 0) {
+    throw new Error(`complete runtime provenance is required before mutation; missing ${missing.join(', ')}`)
+  }
+  const source = {
+    transport: candidate.transport ?? 'git',
+    repository: candidate.repository,
+    tag: candidate.tag,
+    tag_object: candidate.tag_object,
+    commit: candidate.commit,
+    tree: candidate.tree,
+    bin: candidate.bin ?? RUNTIME_BIN,
+  }
+  if (source.transport !== 'git') throw new Error('runtime transport must be git')
+  if (source.repository !== RUNTIME_REPOSITORY) throw new Error(`runtime repository must be ${RUNTIME_REPOSITORY}`)
+  if (source.tag !== `v${PROJECT_OS_VERSION}` || !/^v[0-9]+\.[0-9]+\.[0-9]+$/.test(source.tag)) {
+    throw new Error(`runtime tag must be v${PROJECT_OS_VERSION}`)
+  }
+  for (const key of ['tag_object', 'commit', 'tree']) {
+    if (!GIT_OBJECT_ID.test(source[key])) throw new Error(`runtime ${key} must be a lowercase 40-hex Git object ID`)
+  }
+  if (source.bin !== RUNTIME_BIN) throw new Error(`runtime bin must be ${RUNTIME_BIN}`)
+  return source
+}
+
+async function gitValue(root, args, label) {
+  try {
+    const { stdout } = await execute('git', args, { cwd: root, encoding: 'utf8', maxBuffer: 1024 * 1024 })
+    return stdout.trim()
+  } catch (error) {
+    if (error?.code === 'ENOENT') throw new Error('runtime source verification requires git')
+    throw new Error(`runtime source verification failed: ${label}`)
+  }
+}
+
+export async function verifyRuntimeSource(input = {}, options = {}) {
+  const source = normalizeRuntimeSource(input)
+  const checkoutRoot = options.checkoutRoot ?? packageRoot
+  const observed = {
+    origin: await gitValue(checkoutRoot, ['config', '--local', '--get', 'remote.origin.url'], 'origin is unavailable'),
+    tag_object: await gitValue(checkoutRoot, ['rev-parse', `refs/tags/${source.tag}`], 'tag object is unavailable'),
+    tag_type: await gitValue(checkoutRoot, ['cat-file', '-t', source.tag_object], 'tag object type is unavailable'),
+    commit: await gitValue(checkoutRoot, ['rev-parse', `refs/tags/${source.tag}^{}`], 'peeled commit is unavailable'),
+    tree: await gitValue(checkoutRoot, ['rev-parse', `refs/tags/${source.tag}^{}^{tree}`], 'commit tree is unavailable'),
+    head: await gitValue(checkoutRoot, ['rev-parse', 'HEAD'], 'checkout HEAD is unavailable'),
+    head_ref: await gitValue(checkoutRoot, ['rev-parse', '--abbrev-ref', 'HEAD'], 'checkout HEAD mode is unavailable'),
+    head_tree: await gitValue(checkoutRoot, ['rev-parse', 'HEAD^{tree}'], 'checkout tree is unavailable'),
+    status: await gitValue(checkoutRoot, ['status', '--porcelain=v1', '--untracked-files=all', '--ignored=matching'], 'checkout status is unavailable'),
+  }
+  if (observed.origin !== source.repository) throw new Error('runtime source verification failed: origin differs from the public repository')
+  if (observed.tag_type !== 'tag') throw new Error('runtime source verification failed: release tag is not annotated')
+  for (const key of ['tag_object', 'commit', 'tree']) {
+    if (observed[key] !== source[key]) throw new Error(`runtime source verification failed: ${key} differs from the requested binding`)
+  }
+  if (observed.head !== source.commit || observed.head_tree !== source.tree) {
+    throw new Error('runtime source verification failed: executing checkout differs from the requested commit and tree')
+  }
+  if (observed.head_ref !== 'HEAD') throw new Error('runtime source verification failed: executing checkout is not detached')
+  if (observed.status !== '') throw new Error('runtime source verification failed: executing checkout is dirty')
+  try {
+    const bin = await lstat(join(checkoutRoot, source.bin))
+    if (!bin.isFile()) throw new Error('not a regular file')
+  } catch {
+    throw new Error('runtime source verification failed: direct Node bin is missing')
+  }
+  Object.defineProperty(source, VERIFIED_RUNTIME_SOURCE, { value: true })
+  return Object.freeze(source)
+}
+
+async function requiredRuntimeSource(options = {}) {
+  if (options.runtimeSource?.[VERIFIED_RUNTIME_SOURCE] === true) return options.runtimeSource
+  return verifyRuntimeSource(options)
+}
+
+export function runtimeTemplateReplacements(input) {
+  const source = normalizeRuntimeSource({ runtimeSource: input })
+  return {
+    '{{RUNTIME_REPOSITORY_JSON}}': JSON.stringify(source.repository),
+    '{{RUNTIME_TAG_JSON}}': JSON.stringify(source.tag),
+    '{{RUNTIME_TAG_OBJECT_JSON}}': JSON.stringify(source.tag_object),
+    '{{RUNTIME_COMMIT_JSON}}': JSON.stringify(source.commit),
+    '{{RUNTIME_TREE_JSON}}': JSON.stringify(source.tree),
+  }
+}
+
+function launcherConfiguration(source) {
+  return {
+    schema_version: 2,
+    program: 'node',
+    arguments: ['.project-os/project-os-launcher.mjs'],
+    cwd: 'project-root',
+    source: normalizeRuntimeSource({ runtimeSource: source }),
+    cache: {
+      scope: 'user',
+      key: 'tag-object',
+      environment_override: 'SISO_PROJECT_OS_CACHE_DIR',
+    },
+  }
 }
 
 function compareVersions(left, right) {
@@ -71,8 +203,9 @@ function render(content, values) {
   return output
 }
 
-async function desiredAssets(root, configuration) {
-  const values = replacements(configuration)
+async function desiredAssets(root, configuration, runtimeSource) {
+  const source = normalizeRuntimeSource({ runtimeSource })
+  const values = { ...replacements(configuration), ...runtimeTemplateReplacements(source) }
   const assets = new Map()
   for (const path of await walkFiles(templateRoot)) {
     if (path === '.project-os/project.json') continue
@@ -84,7 +217,7 @@ async function desiredAssets(root, configuration) {
   const upgradedConfiguration = {
     ...configuration,
     project_os_version: PROJECT_OS_VERSION,
-    launcher: { program: 'npx', arguments: ['--yes', `github:sisodias/siso-project-os#v${PROJECT_OS_VERSION}`] },
+    launcher: launcherConfiguration(source),
   }
   assets.set('.project-os/project.json', `${JSON.stringify(upgradedConfiguration, null, 2)}\n`)
   return assets
@@ -137,7 +270,9 @@ async function manifestFor(root, paths, options = {}) {
 
 export async function writeInstallManifest(projectRoot, options = {}) {
   const root = resolve(projectRoot)
-  const paths = options.paths ?? [...(await desiredAssets(root, (await projectConfiguration(root)).value)).keys()]
+  const configuration = options.paths ? null : (await projectConfiguration(root)).value
+  const runtimeSource = configuration?.launcher?.source
+  const paths = options.paths ?? [...(await desiredAssets(root, configuration, runtimeSource)).keys()]
   const manifest = await manifestFor(root, paths, options)
   const target = join(root, INSTALL_MANIFEST_PATH)
   if (await pathExists(target)) {
@@ -159,11 +294,12 @@ function renderUpgradeHtml(record) {
 
 export async function planUpgrade(projectRoot, options = {}) {
   const root = resolve(projectRoot)
+  const runtimeSource = await requiredRuntimeSource(options)
   const configuration = await projectConfiguration(root)
   const existingManifest = await installedManifest(root)
   const fromVersion = configuration.value.project_os_version ?? existingManifest?.installed_version ?? 'legacy-unversioned'
   const order = compareVersions(fromVersion, PROJECT_OS_VERSION)
-  const desired = await desiredAssets(root, configuration.value)
+  const desired = await desiredAssets(root, configuration.value, runtimeSource)
   const installedHashes = new Map((existingManifest?.files ?? []).map((entry) => [entry.path, entry.sha256]))
   const historical = await historicalHashes(replacements(configuration.value))
   const operations = []
@@ -184,10 +320,6 @@ export async function planUpgrade(projectRoot, options = {}) {
     if (PROTECTED_RUNTIME_SHIMS.has(path)) {
       const routed = current.toString('utf8').includes('.agents/skills/project-operator/SKILL.md')
       operations.push({ action: routed ? 'retain' : 'preserve', path, reason: routed ? 'engine-owned rules already contain the canonical route' : 'engine-owned rules need manual route merge', from_sha256: fromSha, to_sha256: toSha })
-      continue
-    }
-    if (path === '.project-os/project.json') {
-      operations.push({ action: 'replace', path, reason: 'merge the target Project OS version into canonical project configuration', from_sha256: fromSha, to_sha256: toSha })
       continue
     }
     const owned = installedHashes.get(path) === fromSha
@@ -214,6 +346,7 @@ export async function planUpgrade(projectRoot, options = {}) {
     created_at: now,
     applied_at: null,
     rolled_back_at: null,
+    target_source: runtimeSource,
     backup_root: `.project-os/upgrades/${id}/backup`,
     operations,
     unresolved_paths: unresolvedPaths,
@@ -244,7 +377,7 @@ export async function applyUpgrade(projectRoot, options = {}) {
     if (options.dryRun || plan.current) return { ok: true, dry_run: options.dryRun === true, current: plan.current, plan }
 
     const configuration = (await projectConfiguration(root)).value
-    const desired = await desiredAssets(root, configuration)
+    const desired = await desiredAssets(root, configuration, plan.target_source)
     const targetContents = new Map(desired)
     const manifest = {
       schema_version: 1,
@@ -304,7 +437,10 @@ export async function applyUpgrade(projectRoot, options = {}) {
       ok: true,
       dry_run: false,
       record: `.project-os/upgrades/${record.id}/upgrade.html`,
-      next_commands: ['project-os build .', 'project-os check . --json'],
+      next_commands: [
+        { program: 'node', arguments: ['.project-os/project-os-launcher.mjs', 'build', '.'] },
+        { program: 'node', arguments: ['.project-os/project-os-launcher.mjs', 'check', '.', '--json'] },
+      ],
       upgrade: record,
     }
   })
@@ -334,13 +470,21 @@ export async function rollbackUpgrade(projectRoot, id, options = {}) {
       if (operation.action === 'create') await unlink(target)
       else await writeFile(target, await readFile(join(root, record.backup_root, operation.path)))
     }
+    for (const operation of changed.filter((entry) => entry.action === 'replace')) {
+      if (digest(await readFile(resolveProjectPointer(root, operation.path))) !== operation.from_sha256) {
+        throw new Error(`rollback verification failed for ${operation.path}`)
+      }
+    }
     record.state = 'rolled_back'
     record.rolled_back_at = isoNow(options)
     await writeUpgradeRecord(root, record)
     return {
       ok: true,
       record: `.project-os/upgrades/${id}/upgrade.html`,
-      next_commands: [`rebuild projections with the restored ${record.from_version} Project OS launcher`, 'run the restored Project OS check'],
+      restored_source: record.from_version === '0.5.0' ? V0_5_0_SOURCE : null,
+      next_commands: record.from_version === '0.5.0'
+        ? [{ program: 'node', arguments: ['<VERIFIED_V0_5_0_SOURCE>/bin/siso-project-os.mjs', 'check', '.', '--json'], source: V0_5_0_SOURCE }]
+        : [`rebuild projections with the restored ${record.from_version} Project OS launcher`, 'run the restored Project OS check'],
       upgrade: record,
     }
   })

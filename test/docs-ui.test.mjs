@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
-import { mkdir, mkdtemp, readFile, rename, rm, writeFile } from 'node:fs/promises'
+import { cp, mkdir, mkdtemp, readFile, rename, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
-import { dirname, join, resolve } from 'node:path'
+import { dirname, join, relative, resolve } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import test from 'node:test'
 import { fileURLToPath } from 'node:url'
@@ -14,10 +14,48 @@ import { decisionFromUiReview, uiCampaignCompletionProblems, uiRecordDigest } fr
 import { expectedUiCampaignProjections } from '../src/ui-projections.mjs'
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const bin = join(repoRoot, 'bin', 'siso-project-os.mjs')
+const releaseRoot = await mkdtemp(join(tmpdir(), 'siso-project-os-docs-ui-release-'))
+const sourceRoot = join(releaseRoot, 'source')
+const repository = 'https://github.com/sisodias/siso-project-os.git'
+
+function gitAt(cwd, args) {
+  const result = spawnSync('git', args, { cwd, encoding: 'utf8' })
+  assert.equal(result.status, 0, `git ${args.join(' ')} failed:\n${result.stdout}\n${result.stderr}`)
+  return result.stdout.trim()
+}
+
+await cp(repoRoot, sourceRoot, {
+  recursive: true,
+  filter: (source) => {
+    const pointer = relative(repoRoot, source)
+    return pointer !== '.git' && !pointer.startsWith('.git/') && !pointer.startsWith('.git\\')
+  },
+})
+gitAt(sourceRoot, ['init', '-b', 'main'])
+gitAt(sourceRoot, ['config', 'user.name', 'Project OS docs UI test'])
+gitAt(sourceRoot, ['config', 'user.email', 'project-os-docs-ui@example.invalid'])
+gitAt(sourceRoot, ['remote', 'add', 'origin', repository])
+gitAt(sourceRoot, ['add', '.'])
+gitAt(sourceRoot, ['commit', '-m', 'Create synthetic v0.5.1 release'])
+gitAt(sourceRoot, ['tag', '-a', 'v0.5.1', '-m', 'Synthetic v0.5.1'])
+const tagObject = gitAt(sourceRoot, ['rev-parse', 'refs/tags/v0.5.1'])
+const commit = gitAt(sourceRoot, ['rev-parse', 'refs/tags/v0.5.1^{}'])
+const tree = gitAt(sourceRoot, ['rev-parse', 'refs/tags/v0.5.1^{}^{tree}'])
+gitAt(sourceRoot, ['checkout', '--detach', commit])
+const bin = join(sourceRoot, 'bin', 'siso-project-os.mjs')
+const provenance = [
+  '--runtime-repository', repository,
+  '--runtime-tag', 'v0.5.1',
+  '--runtime-tag-object', tagObject,
+  '--runtime-commit', commit,
+  '--runtime-tree', tree,
+]
+
+test.after(() => rm(releaseRoot, { recursive: true, force: true }))
 
 function run(args, expected = 0) {
-  const result = spawnSync(process.execPath, [bin, ...args], { encoding: 'utf8' })
+  const requiresProvenance = args[0] === 'init' || args[0] === 'adopt' || (args[0] === 'upgrade' && args[1] !== 'rollback')
+  const result = spawnSync(process.execPath, [bin, ...args, ...(requiresProvenance ? provenance : [])], { encoding: 'utf8' })
   assert.equal(result.status, expected, `unexpected exit for ${args.join(' ')}\nstdout:\n${result.stdout}\nstderr:\n${result.stderr}`)
   return result
 }
