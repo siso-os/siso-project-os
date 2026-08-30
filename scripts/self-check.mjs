@@ -40,6 +40,13 @@ for (const file of (await walkFiles(packageRoot)).filter((path) => path.endsWith
   if (!markdownAllowed(file)) failures.push(`unauthorized Markdown authority: ${file}`)
 }
 
+const projectAgentsContract = await readFile(join(packageRoot, 'docs', 'project-agents-contract.html'), 'utf8')
+if (!projectAgentsContract.includes('data-contract="project-agents-contract"')
+  || !projectAgentsContract.includes('duplicate_authorities')
+  || !projectAgentsContract.includes('competing_boot_sequences')) {
+  failures.push('project-agents contract is missing boot/context invariants')
+}
+
 for (const directory of ['docs', 'template/.agents', 'template/.uihub', 'template/docs']) {
   for (const file of (await walkFiles(join(packageRoot, directory))).filter((path) => path.endsWith('.html'))) {
     const content = await readFile(join(packageRoot, directory, file), 'utf8')

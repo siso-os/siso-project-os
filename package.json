@@ -22,7 +22,8 @@
   "scripts": {
     "test": "node --test",
     "check": "node scripts/self-check.mjs",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "audit:project-agents": "node scripts/audit-project-agents.mjs"
   },
   "engines": {
     "node": ">=20"

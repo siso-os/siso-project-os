@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "record_type": "successor-record",
+  "run_id": "agent-base-retirement-20260809",
+  "status": "ready-for-parent-sol-gate",
+  "successor": {
+    "location": "SISO_Agents/",
+    "policy": "canonical Works own released responsibilities; Agent Base remains only as a bounded compatibility/archive surface until parent retirement gates close"
+  },
+  "canonical_works": [
+    {"id":"siso-project-os","name":"SISO Project OS","responsibility":"project-local operating infrastructure and cold-pickup contract"},
+    {"id":"siso-agent-runtime","name":"SISO Agent Runtime","responsibility":"provider-neutral host execution, lifecycle, context, status, and profile composition"},
+    {"id":"siso-agent-zero","name":"SISO Agent Zero","responsibility":"intent-holding boot and coordination policy"},
+    {"id":"siso-agent-brain","name":"SISO Agent Brain","responsibility":"shared durable state service and API contract"},
+    {"id":"siso-skills-hub","name":"Skills Hub","responsibility":"atomic capability registry, discovery, installation, and promotion"},
+    {"id":"siso-agent-playbook","name":"SISO Agent Playbook","responsibility":"repeatable scenarios composing skills, tools, prompts, gates, and evidence"},
+    {"id":"siso-session-intelligence","name":"SISO Session Intelligence","responsibility":"privacy-reduced learning and recall from explicitly supplied sessions"},
+    {"id":"siso-agent-integrations","name":"SISO Agent Integrations","responsibility":"experimental adapters with promotion and rollback contracts"},
+    {"id":"siso-agent-hooks","name":"SISO Agent Hooks","responsibility":"portable manifest-driven Claude Code and Codex lifecycle hooks"},
+    {"id":"siso-agent-stack","name":"SISO Agent Stack","responsibility":"version-pinned public distribution and bootstrap"}
+  ],
+  "topology_preservation": {
+    "registered_worktrees": 2,
+    "local_branches_retained": 35,
+    "auxiliary_worktrees_recoverably_preserved": 20,
+    "active_registered_worktrees_dirty_clean": "1/1",
+    "unique_commits_in_active_registered_heads": 18,
+    "branch_heads_verified": 20,
+    "bundle_verify": "20/20",
+    "sha256sums": "20/20",
+    "dirty_manifest_entries": 73,
+    "dirty_manifest_hashes": 36,
+    "private_state_custody_entries": 92,
+    "current_custody_verifier": "artifacts/waveb-preservation/verify-current-custody.mjs",
+    "current_custody_receipt": "receipts/current-custody-verifier.md",
+    "preservation_evidence": "20 bundles, 20 checksum sets, 73 dirty manifest entries, 36 dirty manifest hashes, and 92 private/state custody entries; old 22-row Wave 3 verifiers are historical pre-mutation evidence only",
+    "current_custody_result": "STATUS=PASS registered_worktrees=2 local_branches=35 trash_destinations=20 branch_heads=20 bundle_verify=20/20 sha256sums=20/20 dirty_entries=73 dirty_hashes=36 private_state_custody=92 stale_22_row_rejected=true release_smoke=PASS source_drift=PASS shell=PASS"
+  },
+  "project_agents_pilots": [
+    {
+      "work": "siso-agent-runtime",
+      "project_local_path": "siso-agent-runtime/.agents/",
+      "first_read_bytes": 25468,
+      "first_read_tokens_estimate": 6367,
+      "duplicate_authorities": 0,
+      "competing_boot_sequences": 0,
+      "bounded_context_producer": true,
+      "project_os_check_errors": 0
+    },
+    {
+      "work": "siso-agent-stack",
+      "project_local_path": "siso-agent-stack/.agents/",
+      "first_read_bytes": 25534,
+      "first_read_tokens_estimate": 6384,
+      "duplicate_authorities": 0,
+      "competing_boot_sequences": 0,
+      "bounded_context_producer": true,
+      "project_os_check_errors": 0
+    }
+  ],
+  "verification": {
+    "project_os": {"npm_test_passed": 43, "schema_count": 41, "smoke": "pass", "pack": "pass"},
+    "runtime": {"tests_passed": 5, "contract_check": "pass", "publication_check": "pass"},
+    "stack": {"tests_passed": 8, "pinned_components": 10, "portable_surfaces": 9, "verify": "pass", "plan": "pass"},
+    "consumer_graph": {"rows": 30, "live_rows": 28, "detached_rows": 2, "skill_roots": 6, "skill_entries": 514, "source_backed_skill_entries": 340, "broken_skill_links": 0, "unresolved": 0, "bin_consumers": 13, "launcher_consumers": 3, "installed_copy_consumers": 0, "verifier": "handoffs/verify-consumer-graph.mjs", "verifier_result": "PASS rows=30 live_rows=28 detached_rows=2 skill_roots=6 skill_entries=514 source_backed=340 unresolved=0", "dispatch_contract": {"required_tokens": ["siso-version", "siso-exec-lean"], "normal_tui_tokens": ["siso-tui", "siso: React TUI is retired"], "retired_react_dispatch": true, "detached_react_evidence_row": true, "detached_installed_copy": true}},
+    "skill_root_audit": {"roots": 6, "entries": 508, "broken": 0, "missing": 0, "metric": "SKILL.md-bearing rows emitted by audit-skill-roots.mjs; verifier projection census is 514 all-direct-entry rows with a six-entry delta of five markerless directories plus codex/LANE-REGISTRY.md", "receipt": "SISO_Agent_Base/.agents/runs/agent-base-retirement-20260809/receipts/skill-count-reconciliation-20260809.md"},
+    "global_cli_projection": {"status": "pass", "projection": "global CLI projection receipt", "rollback_receipt": "receipts/fix-wave-runtime-stack-20260809.md", "rollback_probe": "pass for 3 focused projection files", "default_fallback": "legacy fallback only when canonical executables are absent", "update_dry_run": "pass", "doctor": "pass with expected clean uninstalled home exit", "react_tui": "retired with bounded dispatch marker and no live target"},
+    "capability_projections": {"canonical_names": 36, "homes": 2, "managed_links": 72, "realpath_matches": 72, "hash_mismatches": 0, "legacy_shim_links": 120, "protected_backups": 27, "active_stale_installed_links": 0},
+    "affected_suites": {
+      "project_os": "pass npm test=43, check=41 schemas, smoke, pack",
+      "runtime": "pass npm test=5 plus contract/publication safety",
+      "stack": "pass npm test=8, verify=10 pinned components/9 portable surfaces",
+      "hooks": "pass 21 tests plus temporary install/doctor",
+      "skills_hub": "pass 32 skills",
+      "playbook": "pass 5 skills/8 entrypoints",
+      "integrations": "pass",
+      "session_intelligence": "pass privacy/publication/recall",
+      "brain": "pass",
+      "agent_zero": "pass",
+      "skill_root_audit": "pass roots=6 entries=508 broken=0 missing=0",
+      "skill_root_smoke": "pass",
+      "domain_layout": "pass ten independent Works",
+      "release_surface": "pass warnings=16 non-fatal pre-existing untracked files",
+      "source_drift": "pass errors=0",
+      "public_safety": "pass no live secret or private payload publication"
+    },
+    "pilot_audits": {"duplicate_authorities": 0, "competing_boot_sequences": 0, "bounded_context_producers": 2},
+    "fix_wave": {"runtime_stack_receipt": "receipts/fix-wave-runtime-stack-20260809.md", "installed_copy_receipt": "receipts/stale-installed-containment-20260809.md", "react_tui_receipt": "receipts/react-tui-retirement-20260809.md", "broken_skill_backup_receipt": "receipts/broken-skill-backup-archive-20260809.md", "react_tui_archive": "Trash/SISO-retired-react-tui-20260809/siso-react-tui", "consumer_verifier": "handoffs/verify-consumer-graph.mjs", "consumer_verifier_result": "PASS rows=30 live_rows=28 detached_rows=2 skill_roots=6 skill_entries=514 source_backed=340 unresolved=0", "remote_actions": 0}
+  },
+  "agent_base_retirement_surface": {
+    "readme": "warehouse/compatibility/archive-only with ten successors",
+    "manifest": "retirement-warehouse with canonical_implementation=false and successor/archive machine sections",
+    "compatibility_files": ["bin/siso-agent-base", "bin/siso", "bin/siso-agent", "install.sh", "scripts/install-local.sh", "lib/manifest-paths.mjs"],
+    "canonical_implementation": false
+  },
+  "remote_actions": [],
+  "gates": {
+    "parent_only": [
+      "independent Sol review of the frozen convergence candidate",
+      "remote retirement, deletion, or irreversible Agent Base removal"
+    ],
+    "retirement_state": "not authorized by this record",
+    "historical_verifier_note": "old Wave 3 v4 worktree verifiers are historical pre-mutation evidence and are not current custody proof"
+  },
+  "sanitization": {
+    "private_material": false,
+    "user_identity": false,
+    "secret_values": false,
+    "session_payloads": false,
+    "local_state": false
+  }
+}

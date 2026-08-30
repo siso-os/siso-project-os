@@ -1,0 +1,26 @@
+<!doctype html>
+<!-- project-os-meta
+{
+  "schema_version": 1,
+  "document_id": "route.project-agents-contract",
+  "path": "docs/project-os/AGENTS-CONTRACT.html",
+  "title": "Project-local agents contract",
+  "kind": "spec",
+  "domain": "project-governance",
+  "status": "current",
+  "answers_question": "How does this project use one bounded Project OS route for durable agent work and cold pickup?",
+  "authority_key": "route.project-os.agents-contract",
+  "owner": "project-maintainers",
+  "created_at": "2026-08-09",
+  "reviewed_at": "2026-08-09",
+  "review_due_at": null,
+  "canonical_pointer": "docs/project-os/AGENTS-CONTRACT.html",
+  "supersedes": [],
+  "superseded_by": null,
+  "source_pointers": ["AGENTS.md", "PROJECT-OS.html", ".agents/skills/project-operator/OPERATOR.html"],
+  "evidence": { "grade": "inspection", "observed_at": "2026-08-09", "proof_pointers": [], "verifier": null },
+  "tags": ["agents", "cold-pickup", "project-os", "verification"]
+}
+-->
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Project-local agents contract</title><style>body{font:15px/1.55 system-ui;max-width:72rem;margin:auto;padding:2rem;color:#17202a}section{border-top:1px solid #dce2ea;padding:1rem 0}code{overflow-wrap:anywhere}</style></head>
+<body><main data-contract="project-agents-contract"><h1>Project-local agents contract</h1><p>One Project OS route for durable work, cold pickup, verification, and auditable projections.</p><section><h2>Canonical writers</h2><p>Tasks live in <code>.agents/tasks/**/task.json</code>; runs and receipts live under <code>.agents/</code>; durable knowledge lives under <code>docs/</code> and <code>.agents/memory/</code>. Generated HTML/JSON is never an alternate writer.</p></section><section><h2>Cold pickup</h2><p>Read root rules, <code>PROJECT-OS.html</code>, <code>FILE-TREE.html</code>, onboarding, one canonical task, and only its linked execution context. Scratch, raw history, generated views, and optional capabilities are pointer-addressed.</p></section><section><h2>Boot boundary</h2><p><code>AGENTS.md</code>, <code>CLAUDE.md</code>, and <code>SKILL.md</code> are routing shims to one operator authority. Audit requires <code>duplicate_authorities=0</code>, <code>competing_boot_sequences=0</code>, and a bounded context producer.</p></section></main><script type="application/json">{"schema_version":1,"kind":"project-agents-contract","generated_writer":false,"checks_read_only":true,"duplicate_authorities":0,"competing_boot_sequences":0,"context":"bounded"}</script></body></html>
