@@ -1,6 +1,6 @@
 {
   "name": "@siso/project-os",
-  "version": "0.5.0",
+  "version": "0.4.1",
   "description": "Agent-first per-project operating system: tasks, docs spine, UI campaigns, and anti-drift checks",
   "type": "module",
   "bin": {

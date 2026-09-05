@@ -21,7 +21,7 @@ owner's report; completion still needs the linked evidence.
 Read [AGENTS.md](../AGENTS.md), [PROJECT-OS.html](../PROJECT-OS.html), and
 [FILE-TREE.html](../FILE-TREE.html). Record the project's actual setup, run and
 test commands here after checking them. The kit's verification command is
-`npx --yes github:sisodias/siso-project-os#v0.5.0 check . --json`.
+`npx --yes github:sisodias/siso-project-os#v0.4.1 check . --json`.
 
 ## Links
 

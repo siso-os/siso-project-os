@@ -50,4 +50,4 @@ verification adapters, and optional providers through the declared capability in
   canonical tasks/runs and never become hidden writers.
 
 Run the pinned launcher before handoff. For this installed version:
-`npx --yes github:sisodias/siso-project-os#v0.5.0 check . --json`.
+`npx --yes github:sisodias/siso-project-os#v0.4.1 check . --json`.

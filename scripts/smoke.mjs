@@ -26,12 +26,12 @@ try {
   }
   run(['init', root, '--name', 'Smoke Project'])
   const configuration = JSON.parse(await readFile(join(root, '.project-os', 'project.json'), 'utf8'))
-  if (configuration.project_os_version !== '0.5.0') throw new Error(`unexpected Project OS version: ${configuration.project_os_version}`)
-  if (JSON.stringify(configuration.launcher) !== JSON.stringify({ program: 'npx', arguments: ['--yes', 'github:sisodias/siso-project-os#v0.5.0'] })) {
+  if (configuration.project_os_version !== '0.4.1') throw new Error(`unexpected Project OS version: ${configuration.project_os_version}`)
+  if (JSON.stringify(configuration.launcher) !== JSON.stringify({ program: 'npx', arguments: ['--yes', 'github:sisodias/siso-project-os#v0.4.1'] })) {
     throw new Error(`unexpected pinned launcher: ${JSON.stringify(configuration.launcher)}`)
   }
   const installManifest = JSON.parse(await readFile(join(root, '.project-os', 'install-manifest.json'), 'utf8'))
-  if (installManifest.installed_version !== '0.5.0' || installManifest.files.length < 100) {
+  if (installManifest.installed_version !== '0.4.1' || installManifest.files.length < 100) {
     throw new Error(`install manifest incomplete: ${JSON.stringify(installManifest)}`)
   }
   const portableDoctor = JSON.parse(run(['doctor', root, '--json']).stdout)
