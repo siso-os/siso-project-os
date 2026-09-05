@@ -56,7 +56,7 @@ async function simulateLegacy(root) {
 test('current installation records managed hashes and plans no upgrade', async (t) => {
   const root = await fixture(t)
   const manifest = JSON.parse(await readFile(join(root, '.project-os', 'install-manifest.json'), 'utf8'))
-  assert.equal(manifest.installed_version, '0.4.0')
+  assert.equal(manifest.installed_version, '0.5.0')
   assert.ok(manifest.files.some((entry) => entry.path === '.agents/agents/project-operator.json'))
   const plan = await planUpgrade(root, { id: 'UPGRADE-CURRENT-TEST', now: '2026-07-29T00:00:00.000Z' })
   assert.equal(plan.current, true)
@@ -70,7 +70,7 @@ test('legacy v0.3 baseline upgrades safely and rolls back exactly', async (t) =>
   const options = { id: 'UPGRADE-LEGACY-TEST', now: '2026-07-29T00:00:00.000Z', by: 'test-agent' }
   const plan = await planUpgrade(root, options)
   assert.equal(plan.from_version, 'legacy-unversioned')
-  assert.equal(plan.to_version, '0.4.0')
+  assert.equal(plan.to_version, '0.5.0')
   assert.equal(plan.can_apply, true)
   const role = plan.operations.find((entry) => entry.path === '.agents/agents/project-operator.json')
   assert.equal(role.action, 'replace')
@@ -80,9 +80,9 @@ test('legacy v0.3 baseline upgrades safely and rolls back exactly', async (t) =>
   assert.equal(applied.ok, true)
   assert.equal(applied.upgrade.state, 'applied')
   assert.match(await readFile(join(root, '.agents', 'agents', 'project-operator.json'), 'utf8'), /PROJECT-OS\.html/)
-  assert.equal(JSON.parse(await readFile(join(root, '.project-os', 'project.json'), 'utf8')).project_os_version, '0.4.0')
-  assert.deepEqual(JSON.parse(await readFile(join(root, '.project-os', 'project.json'), 'utf8')).launcher, { program: 'npx', arguments: ['--yes', 'github:sisodias/siso-project-os#v0.4.0'] })
-  assert.equal(JSON.parse(await readFile(join(root, '.project-os', 'install-manifest.json'), 'utf8')).installed_version, '0.4.0')
+  assert.equal(JSON.parse(await readFile(join(root, '.project-os', 'project.json'), 'utf8')).project_os_version, '0.5.0')
+  assert.deepEqual(JSON.parse(await readFile(join(root, '.project-os', 'project.json'), 'utf8')).launcher, { program: 'npx', arguments: ['--yes', 'github:sisodias/siso-project-os#v0.5.0'] })
+  assert.equal(JSON.parse(await readFile(join(root, '.project-os', 'install-manifest.json'), 'utf8')).installed_version, '0.5.0')
   assert.match(await readFile(join(root, applied.record), 'utf8'), /data-contract="project-os-upgrade"/)
 
   const rolledBack = await rollbackUpgrade(root, options.id, { now: '2026-07-29T01:00:00.000Z' })

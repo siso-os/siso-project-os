@@ -149,7 +149,7 @@ test('mission ownership and resume snapshots fail closed and remain HTML-first',
   assert.equal(released.state, 'released')
   assert.deepEqual(await missionStatus(root), [])
   const lifecycleMarkdown = (await walkFiles(join(root, '.agents'))).filter((path) => path.endsWith('.md'))
-  assert.deepEqual(lifecycleMarkdown, ['skills/project-operator/SKILL.md'], 'only the runtime-mandated skill discovery shim remains Markdown')
+  assert.deepEqual(lifecycleMarkdown, ['HANDOFF.md', 'PAGE.md', 'skills/project-operator/SKILL.md'], 'Markdown is limited to the explicit spine entry files and runtime discovery shim')
   for (const relativePath of (await walkFiles(join(root, '.agents'))).filter((path) => path.endsWith('.html'))) {
     const html = await readFile(join(root, '.agents', relativePath), 'utf8')
     assert.match(html, /^<!doctype html>/)

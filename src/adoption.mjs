@@ -219,6 +219,7 @@ async function projectAdoptionOperations(root, options = {}) {
 
 async function legacyMarkdown(root) {
   const allowed = (path) => path === 'AGENTS.md' || path === 'CLAUDE.md' || path.endsWith('/SKILL.md')
+    || path === '.agents/PAGE.md' || path === '.agents/HANDOFF.md'
   const files = []
   for (const directory of ['.agents', '.uihub', 'docs']) {
     for (const path of await walkFiles(join(root, directory))) files.push(`${directory}/${path}`)

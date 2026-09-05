@@ -35,6 +35,8 @@ for (const file of await walkFiles(packageRoot)) {
 const markdownAllowed = (file) => file === 'AGENTS.md'
   || file === 'template/AGENTS.md'
   || file === 'template/CLAUDE.md'
+  || file === 'template/.agents/PAGE.md'
+  || file === 'template/.agents/HANDOFF.md'
   || /^template\/\.agents\/skills\/[^/]+\/SKILL\.md$/.test(file)
 for (const file of (await walkFiles(packageRoot)).filter((path) => path.endsWith('.md') && !path.startsWith('.git/'))) {
   if (!markdownAllowed(file)) failures.push(`unauthorized Markdown authority: ${file}`)

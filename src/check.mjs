@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
 import { spawnSync } from 'node:child_process'
-import { readFile, stat } from 'node:fs/promises'
+import { lstat, readFile, stat } from 'node:fs/promises'
 import { join } from 'node:path'
 import { checkArchitecture } from './architecture.mjs'
 import { UI_STAGES, listDirectories, pathExists, resolveProjectPointer, taskFolderForStatus, walkFiles } from './shared.mjs'
@@ -63,6 +63,39 @@ export async function checkProject(root) {
   }
 
   const installManifestPath = join(root, '.project-os', 'install-manifest.json')
+  if (schemas.has('project-spine')) {
+    const readable = new Set()
+    for (const path of ['.agents/PAGE.md', '.agents/HANDOFF.md', '.agents/owners.log', '.agents/page.url', '.agents/repos.json']) {
+      try {
+        if (!(await lstat(join(root, path))).isFile()) add(errors, 'invalid_spine_file', 'spine path must be a regular file', path)
+        else readable.add(path)
+      } catch (error) {
+        add(errors, 'missing_spine_file', error.message, path)
+      }
+    }
+    if (readable.has('.agents/repos.json')) try {
+      const manifest = JSON.parse(await readFile(join(root, '.agents', 'repos.json'), 'utf8'))
+      addSchemaErrors(errors, schemas, 'project-spine', manifest, '.agents/repos.json')
+      const repositories = [manifest.repository_url, ...(Array.isArray(manifest.satellites) ? manifest.satellites.map(item => item?.repository_url) : [])].filter(Boolean)
+      for (const value of [...repositories, manifest.parent_url].filter(Boolean)) {
+        const url = new URL(value)
+        if (url.protocol !== 'https:' || url.username || url.password) throw new Error('repository links must be HTTPS URLs without credentials')
+      }
+      if (new Set(repositories).size !== repositories.length) add(errors, 'duplicate_spine_repository', 'each repository has one declared role in this project', '.agents/repos.json')
+    } catch (error) {
+      add(errors, 'invalid_spine_json', error.message, '.agents/repos.json')
+    }
+    if (readable.has('.agents/page.url')) try {
+      const pageUrl = (await readFile(join(root, '.agents', 'page.url'), 'utf8')).trim()
+      if (pageUrl) {
+        const url = new URL(pageUrl)
+        if (url.protocol !== 'https:' || url.username || url.password || /\s/.test(pageUrl)) throw new Error('published page must be one HTTPS URL without credentials')
+      }
+    } catch (error) {
+      add(errors, 'invalid_page_url', error.message, '.agents/page.url')
+    }
+  }
+
   if (await pathExists(installManifestPath)) {
     try {
       addSchemaErrors(errors, schemas, 'install-manifest', JSON.parse(await readFile(installManifestPath, 'utf8')), '.project-os/install-manifest.json')

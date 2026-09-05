@@ -17,7 +17,7 @@ protected source project. The source is evidence, never a write target; see `doc
 - New task IDs are allocated under an exclusive lock and validated across every lifecycle folder.
 - Every sprint, run, and UI campaign references canonical task IDs.
 - Durable knowledge is one fact per memory file. Run packets are ephemeral execution contracts.
-- Only runtime-required `AGENTS.md`/`CLAUDE.md` shims remain Markdown. Authored operating surfaces are deterministic HTML; canonical machine records are JSON/JSONL.
+- Runtime-required shims and the explicitly requested `.agents/PAGE.md` / `.agents/HANDOFF.md` front doors use Markdown. Other authored operating surfaces are deterministic HTML; canonical machine records are JSON/JSONL.
 - The package is generic: never copy source-product names, credentials, customer facts, or bulk history.
 - Preserve unrelated work. Multiple agents may edit different owned directories concurrently.
 

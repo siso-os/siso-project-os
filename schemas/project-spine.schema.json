@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://siso.dev/schemas/project-os/project-spine.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "repository_url", "parent_url", "library_work_id", "satellites"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "repository_url": { "anyOf": [{ "$ref": "#/$defs/url" }, { "type": "null" }] },
+    "parent_url": { "anyOf": [{ "$ref": "#/$defs/url" }, { "type": "null" }] },
+    "library_work_id": { "anyOf": [{ "type": "string", "pattern": "^gls:work:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$" }, { "type": "null" }] },
+    "satellites": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role", "repository_url", "visibility"],
+        "properties": {
+          "role": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "repository_url": { "$ref": "#/$defs/url" },
+          "visibility": { "enum": ["public", "private", "unknown"] }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "url": { "type": "string", "pattern": "^https://[^/@?#\\s\\\\]+(?:/[^\\s\\\\]*)?$", "maxLength": 2048 }
+  }
+}

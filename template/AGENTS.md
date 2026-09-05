@@ -24,6 +24,12 @@ spine rules live at `docs/project-os/INDEX.html`; the durable onboarding contrac
 
 ## Runtime and capability boundary
 
+The project front door is `.agents/PAGE.md`; `.agents/HANDOFF.md` routes to the
+current owner's resumable state. `.agents/repos.json` holds repository links,
+`owners.log` indexes material changes, and `page.url` records verified publication.
+These short Markdown entry files are the explicit project-spine exception to
+the kit's HTML-first authored-document convention.
+
 Project OS owns project records and packets; it does not replace the agent CLI that is reading this
 file. Codex CLI operates through this `AGENTS.md`; Claude Code operates through `CLAUDE.md`. Either
 runtime can execute the complete single-agent lifecycle directly. Optional orchestration providers
@@ -44,4 +50,4 @@ verification adapters, and optional providers through the declared capability in
   canonical tasks/runs and never become hidden writers.
 
 Run the pinned launcher before handoff. For this installed version:
-`npx --yes github:sisodias/siso-project-os#v0.4.0 check . --json`.
+`npx --yes github:sisodias/siso-project-os#v0.5.0 check . --json`.
