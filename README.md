@@ -18,8 +18,67 @@
 </p>
 
 <!-- /siso-os:header -->
-## What it is
 
-An agent-first operating system for one project: tasks, a docs spine and UI campaigns.
+Give any repo a working system for its coding agents: one task list, clear ownership of who writes what, and a check that proves work landed. SISO Project OS drops into a new or existing repo, keeps everything you already have, and gives every agent the same way in: what to read first, which task to take, and how to hand it back.
 
-It is part of **Agent Base** in [SISO OS](https://github.com/siso-os), the open-source agent operating system we run SISO on. More on [the website](https://www.sisolabs.space/spyder/).
+More on [the website](https://www.sisolabs.space/agent-base/).
+
+## Install
+
+You need Node.js 20 or later.
+
+1. **Into a new repository:**
+   ```bash
+   npx --yes github:siso-os/siso-project-os init . \
+     --name "My Project" \
+     --summary "What this software is" \
+     --outcome "The user outcome it creates"
+   ```
+
+2. **Into an existing repository:**
+   ```bash
+   npx --yes github:siso-os/siso-project-os adopt plan . --json
+   npx --yes github:siso-os/siso-project-os adopt apply . --json
+   open .project-os/migration/project-kit-migration.html
+   ```
+
+3. **Or keep the `project-os` command on your PATH:**
+   ```bash
+   npm install -g github:siso-os/siso-project-os
+   ```
+   The commands below assume this; with `npx` instead, put `npx --yes github:siso-os/siso-project-os` in place of
+   `project-os`.
+
+Adoption creates only missing files, retains what you have, and appends a thin runtime route to existing AGENTS.md or CLAUDE.md. It never silently overwrites your project's authority.
+
+## Use it
+
+- **Initialise or adopt a project:** `project-os init .` or `project-os adopt apply .` to set up the operating system in your repo.
+- **Onboard:** `project-os onboard` tells agents what to read first and which task, mission, or resume state to pick.
+- **Verify before handoff:** `project-os check` validates every file, schema, and invariant; run this before you land code.
+- **Manage tasks and work:** `project-os task create`, `project-os mission`, `project-os sprint` organise tasks, ownership, and lanes.
+- **Verify delivery:** `project-os claim acquire`, `project-os delivery plan`, and `project-os delivery land` reserve writes, verify attempts, and prove landing.
+- **Run design campaigns:** `project-os ui create` gates candidate designs to task-linked decisions and visual proof.
+
+## How it works
+
+- **HTML authorities, not Markdown:** The canonical operating surfaces (architecture, lifecycle, tasks, decisions, knowledge, UI campaigns) are deterministic HTML with embedded JSON contracts. AGENTS.md and CLAUDE.md are loader shims only.
+- **Immutable work packets:** Every sprint, run, and task claim gets an immutable packet with the concrete write set. Attempts, verifications, and receipts are separate events.
+- **No overwrites on adoption:** Adoption plans the differences, preserves your project edits, takes internal backups, and emits an HTML receipt. Upgrades work the same way.
+- **Agents orient cold:** Every new agent reads AGENTS.md (loader shim), follows to `.agents/skills/project-operator/SKILL.md`, reads the canonical HTML, runs `project-os onboard`, and works only within its reserved write claims.
+- **One canonical task registry:** Tasks live in `.agents/tasks/**/task.json`. Dashboards and reports are projections; they never write.
+
+## Working on Project OS itself
+
+From a clone of this repo, run the tests and checks:
+
+```bash
+npm test
+npm run check
+npm run smoke
+npm pack --dry-run
+```
+
+## Licence
+
+MIT. See [LICENSE](LICENSE).
