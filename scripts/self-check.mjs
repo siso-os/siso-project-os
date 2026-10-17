@@ -33,6 +33,7 @@ for (const file of await walkFiles(packageRoot)) {
 }
 
 const markdownAllowed = (file) => file === 'AGENTS.md'
+  || file === 'README.md' // GitHub/package overview; operating authorities remain HTML.
   || file === 'template/AGENTS.md'
   || file === 'template/CLAUDE.md'
   || file === 'template/.agents/PAGE.md'
