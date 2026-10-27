@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Pinned Project OS launcher for any project root (first user: Action Model); Project OS remains the task/lifecycle writer.
+// Pinned Project OS launcher for any project root (first user: a partner project); Project OS remains the task/lifecycle writer.
 import { createHash } from 'node:crypto';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, renameSync, rmSync } from 'node:fs';
@@ -114,7 +114,7 @@ export function runProjectOs(args, root = ROOT) {
   const forwarded = [];
   for (let i = 0; i < args.length; i += 1) {
     if (args[i] === '--root') {
-      if (!args[i + 1] || resolve(root, args[++i]) !== root) throw new Error('This launcher only operates the Action Model root.');
+      if (!args[i + 1] || resolve(root, args[++i]) !== root) throw new Error('This launcher only operates its pinned project root.');
     } else forwarded.push(args[i]);
   }
   const position = ['onboard', 'check', 'build', 'doctor'].includes(forwarded[0]) ? 1

@@ -7,7 +7,7 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { bootstrapEngine, engineId, readEngineLock, resolveEngine, runProjectOs } from './project-os.mjs';
 
-const scratch = mkdtempSync(join(tmpdir(), 'actionmodel-project-os-'));
+const scratch = mkdtempSync(join(tmpdir(), 'pinned-project-os-'));
 after(() => rmSync(scratch, { recursive: true, force: true }));
 const source = join(scratch, 'source'); mkdirSync(join(source, 'bin'), { recursive: true });
 const cliBytes = Buffer.from('console.log(JSON.stringify({fixture: true, argv: process.argv.slice(2)}));\n');
